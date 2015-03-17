@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Getting Started: Serving Web Content</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet"
+		  th:href="@{/css/kendo.common.min.css}"
+		  href="../css/kendo.common.min.css"/>
+		<link rel="stylesheet"
+		  th:href="@{/css/kendo.bootstrap.min.css}"
+		  href="../css/kendo.bootstrap.min.css"/>
+		<link rel="stylesheet"
+		  th:href="@{/css/kendo.dataviz.min.css}"
+		  href="../css/kendo.dataviz.min.css"/>
+		<link rel="stylesheet"
+		  th:href="@{/css/kendo.dataviz.default.min.css}"
+		  href="../css/kendo.dataviz.default.min.css"/>
+	</head>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/kendo.all.min.js"></script>
+	<body>
+		<p th:text="'Hello, ' + ${loggedInUser} + '!'" />
+		<p>
+			<button id="createVmButton" class="k-primary">Create VM</button>
+		</p>
+		<div id="example">
+			<div id="grid"></div>
+			<script th:inline="javascript" type="text/x-kendo-template" id="template">
+		    	<div class="tabstrip">
+					<ul>
+						<li>
+				        	Stats
+				        </li>
+					</ul>
+		            <div class='vm-details'>
+		                <ul style="list-style:none;font-style:italic;margin: 15px;padding: 0;">
+		                    <li style = "margin: 0;line-height: 1.7em;">
+								<label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">
+									name:
+								</label>
+								#= name #
+							</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">message:</label>#= message #</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">ip:</label>#= ip #</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">status:</label>#= status #</li>
+		                </ul>
+		            </div>
+		        </div>
+		    </script>
+		    <script th:inline="javascript">
+		        var vmObj ="";
+		        $(document).ready(function() {  
+		        	$("#createVmButton").kendoButton();
+		        	$.ajax({
+		                url: "/vms",
+		                success: function (response) {
+		                    // Get default value from the server response
+		                	vmObj=response;
+		                	console.log(vmObj);
+		                	createGrid(vmObj);
+		                },
+		                error: function () {
+		                    // Stop displaying loading indicator
+		                    kendo.ui.progress(editEvent.container, false);
+		                    console.error("uh oh!");
+		                }
+		            });
+		        });
+		        function createGrid(vms) {
+			    	console.log(vms);
+		        	$("#grid").kendoGrid({
+		                dataSource: {
+		                    data: vms,
+		                    schema: {
+		                        model: {
+		                            fields: {
+		                                message: { type: "string" },
+		                                name: { type: "string" },
+		                                ip: { type: "string" },
+		                                status: { type: "string" }
+		                            }
+		                        }
+		                    },
+		                    pageSize: 20
+		                },
+		                height: 550,
+		                scrollable: true,
+		                sortable: true,
+		                filterable: true,
+		                pageable: {
+		                    input: true,
+		                    numeric: false
+		                },
+		                detailTemplate: kendo.template($("#template").html()),
+		                detailInit: detailInit,
+	//                        dataBound: function() {
+	//                            this.expandRow(this.tbody.find("tr.k-master-row").first());
+	//                        },
+		                columns: [
+		                    { field: "name", title: "Name", width: "130px" },
+		                    { field: "message", title: "Message", width: "130px" },
+		                    { field: "ip", title: "IP", width: "130px" },
+		                    { field: "status", title: "Message", width: "130px", template: "#= showColorText(data) #" }
+		                ]
+		            });
+		        	function detailInit(e) {
+		                var detailRow = e.detailRow;
+		                detailRow.find(".tabstrip").kendoTabStrip({
+		                    animation: {
+		                        open: { effects: "fadeIn" }
+		                    }
+		                });
+		        	}
+		        }
+				function showColorText(data) {
+					if(data.status=='Green') return '<span style="color:green;">Green</span>';
+					if(data.status=='Red') return '<span style="color:red;">Red</span>';	
+				}
+		        </script>            
+		    </div>
+	</body>
+</html>
