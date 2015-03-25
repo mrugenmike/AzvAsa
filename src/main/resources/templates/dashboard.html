@@ -15,16 +15,52 @@
 		<link rel="stylesheet"
 		  th:href="@{/css/kendo.dataviz.default.min.css}"
 		  href="../css/kendo.dataviz.default.min.css"/>
+		<link rel="stylesheet"
+		  th:href="@{http://fonts.googleapis.com/css?family=Open+Sans:300,400,700}"
+		  href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/font-awesome.min.css}"
+		  href="../assets/css/font-awesome.min.css"/>
+		<link rel="stylesheet"
+		  th:href="@{/assets/css/bootstrap.min.css}"
+		  href="../assets/css/bootstrap.min.css"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/bootstrap-theme.css}"
+		  href="../assets/css/bootstrap-theme.css"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/main.css}"
+		  href="../assets/css/main.css"/>
 	</head>
 	<script type="text/javascript" src="../js/jquery.min.js"></script>
 	<script type="text/javascript" src="../js/kendo.all.min.js"></script>
-	<body>
-		<p th:text="'Hello, ' + ${loggedInUser} + '!'" />
-		<p>
+	<script src="assets/js/headroom.min.js"></script>
+	<script src="assets/js/jQuery.headroom.min.js"></script>
+	<script src="assets/js/template.js"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+ 	<body>
+	
+	<div class="navbar navbar-inverse navbar-fixed-top headroom" >
+		<div class="container">
+			<div class="navbar-header">
+				<!-- Button for smallest screens -->
+				<a class="navbar-brand" href="/"><img src="assets/images/logo.png" alt="Pronet" width="150 px" height="50 px"></img></a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav pull-right">
+					<li class="active"><a class="btn" href="/login">Sign out</a></li>
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+	</div> 
+	<div  class="dashbrd" style="margin-top:5%;">
+	
+		<div>
 			<button id="createVmButton" class="k-primary">Create VM</button>
-		</p>
+		</div>
+		
 		<div id="example">
 			<div id="grid"></div>
+						
 			<script th:inline="javascript" type="text/x-kendo-template" id="template">
 		    	<div class="tabstrip">
 					<ul>
@@ -42,7 +78,8 @@
 							</li>
 		                    <li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">message:</label>#= message #</li>
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">ip:</label>#= ip #</li>
-		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">status:</label>#= status #</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">status:</label>#= status #</li>						
+							    <div id="chart_div" style="width: 100px; height: 120px;"></div>						
 		                </ul>
 		            </div>
 		        </div>
@@ -65,6 +102,7 @@
 		                    console.error("uh oh!");
 		                }
 		            });
+		        	
 		        });
 		        function createGrid(vms) {
 			    	console.log(vms);
@@ -112,11 +150,36 @@
 		                });
 		        	}
 		        }
+	            google.load("visualization", "1", {packages:["gauge"]});
+	            google.setOnLoadCallback(drawChart);
+	            function drawChart() {
+
+		              var data = google.visualization.arrayToDataTable([
+		                ['Label', 'Value'],
+		                ['Memory', 80],
+		                ['CPU', 55],
+		              ]);
+
+		              var options = {
+		                width: 400, height: 120,
+		                redFrom: 90, redTo: 100,
+		                yellowFrom:75, yellowTo: 90,
+		                minorTicks: 5
+		              };
+
+		              var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+		              chart.draw(data, options);		            
+		              
+		            }
+          	
+
 				function showColorText(data) {
 					if(data.status=='Green') return '<span style="color:green;">Green</span>';
 					if(data.status=='Red') return '<span style="color:red;">Red</span>';	
 				}
 		        </script>            
 		    </div>
+	   </div>
 	</body>
 </html>

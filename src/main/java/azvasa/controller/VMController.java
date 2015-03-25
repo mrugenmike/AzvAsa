@@ -13,6 +13,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import azvasa.model.User;
 
 
 @Controller
@@ -27,8 +41,27 @@ public class VMController {
     public String greeting(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) throws MalformedURLException, RemoteException {
 		model.addAttribute("loggedInUser", "Admin");
         return "dashboard";
+    @RequestMapping("/")
+    public String mainPage() {
+    	return "index";
+    }
+    @RequestMapping("/about")
+    public String aboutPage() {
+    	return "about";
+    }
+    @RequestMapping("/login")
+    public String loginPage() {
+    	return "login";
     }
     
+    @RequestMapping(value ="/dashboard", method=RequestMethod.POST)
+	public String checkLoggedInUser(@ModelAttribute User user, Model model, HttpServletRequest req) {
+    	if(user.getName().equals("admin") && user.getPassword().equals("password")) {
+    		return "dashboard";
+    	}
+    	else return "error";
+    }
+        
     @RequestMapping(value = "/vms", method=RequestMethod.GET)
     @ResponseBody
     public List<VMachine>  getVms() throws RemoteException {
