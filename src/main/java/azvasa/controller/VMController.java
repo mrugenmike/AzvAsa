@@ -39,10 +39,16 @@ public class VMController {
         return allVirtualMachines;
     }
 
-    @ExceptionHandler(RemoteException.class)
+    @ExceptionHandler(value={RemoteException.class,InterruptedException.class})
     public ResponseEntity<String> handleException(){
        HttpHeaders headers = new HttpHeaders();
         headers.put("Content-Type", Arrays.asList("application/json"));
         return new ResponseEntity<String>("{\"error\":\"Please contact service provider\"}",headers,HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @RequestMapping(value = {"/vms/{vm-name}/off"}, method = RequestMethod.POST)
+    public ResponseEntity<String> powerOffVM(@PathVariable("vm-name") String vmName) throws RemoteException, InterruptedException {
+        vmService.powerOffVM(vmName);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 }

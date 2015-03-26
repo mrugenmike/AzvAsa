@@ -28,6 +28,7 @@ public class VMachine {
     private List<String> hostNames;
     private List<String> networkNames;
     private int  guestMemoryUsage;
+    private String ip;
 
     public String getName() {
         return name;
@@ -144,7 +145,6 @@ public class VMachine {
         if(datastores1!=null){
             Arrays.asList(datastores1).stream().forEach(store->dataStoreNames.add(store.getName()));
         }
-
         return new VMachine(vmachineName,vmri.getPowerState().name(), bootTime, guestFullName, guestId, version1,networknames,hosts, guestMemoryUsage1, hostMemoryUsage1, overallCpuUsage,dataStoreNames);
     }
 }
