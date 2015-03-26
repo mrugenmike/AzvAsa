@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1bc4374b-0138-484a-9648-d47a8c54939f" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/azvasa/controller/Application.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/Application.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/azvasa/controller/NoContentException.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/controller/NoContentException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/azvasa/controller/VMController.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/controller/VMController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/azvasa/services/VMNotFoundException.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/services/VMNotFoundException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/azvasa/model/VMachine.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/model/VMachine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/azvasa/services/VmService.java" afterPath="$PROJECT_DIR$/src/main/java/azvasa/services/VmService.java" />
-    </list>
+    <list default="true" id="1bc4374b-0138-484a-9648-d47a8c54939f" name="Default" comment="" />
     <ignored path="AzvAsa.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -901,12 +894,12 @@
       <updated>1427330000234</updated>
       <workItem from="1427330008450" duration="311000" />
       <workItem from="1427330548972" duration="938000" />
-      <workItem from="1427332088867" duration="2040000" />
+      <workItem from="1427332088867" duration="2157000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3289000" />
+    <option name="totallyTimeSpent" value="3406000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="717" extended-state="6" />

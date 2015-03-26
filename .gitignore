@@ -8,7 +8,7 @@ target/
 build/*
 .DS_Store 
 *.class
-
+.idea*
 *.pydevproject
 .project
 .metadata
