@@ -1,9 +1,5 @@
 package azvasa.controller;
 
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
-import java.util.*;
-
 import azvasa.model.VMachine;
 import azvasa.services.VmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Controller
@@ -45,4 +46,15 @@ public class VMController {
         headers.put("Content-Type", Arrays.asList("application/json"));
         return new ResponseEntity<String>("{\"error\":\"Please contact service provider\"}",headers,HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+
+    @RequestMapping(value = "/vms/{vm-name}/on", method=RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String>  powerOnVM(@PathVariable("vm-name") String vmName) throws RemoteException, InterruptedException {
+
+        vmService.powerOnVM(vmName);
+
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
 }
