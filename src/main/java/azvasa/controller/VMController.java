@@ -35,32 +35,6 @@ public class VMController {
 
     @Autowired
     VmService vmService;
-
-	
-    @RequestMapping("/dashboard")
-    public String greeting(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) throws MalformedURLException, RemoteException {
-		model.addAttribute("loggedInUser", "Admin");
-        return "dashboard";
-    @RequestMapping("/")
-    public String mainPage() {
-    	return "index";
-    }
-    @RequestMapping("/about")
-    public String aboutPage() {
-    	return "about";
-    }
-    @RequestMapping("/login")
-    public String loginPage() {
-    	return "login";
-    }
-    
-    @RequestMapping(value ="/dashboard", method=RequestMethod.POST)
-	public String checkLoggedInUser(@ModelAttribute User user, Model model, HttpServletRequest req) {
-    	if(user.getName().equals("admin") && user.getPassword().equals("password")) {
-    		return "dashboard";
-    	}
-    	else return "error";
-    }
         
     @RequestMapping(value = "/vms", method=RequestMethod.GET)
     @ResponseBody

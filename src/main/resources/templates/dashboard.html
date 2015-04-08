@@ -59,6 +59,9 @@
 		</div>
 		
 		<div id="example">
+			<div id="popupVM">
+				<div id="templateGrid"></div>			
+			</div>
 			<div id="grid"></div>
 						
 			<script th:inline="javascript" type="text/x-kendo-template" id="template">
@@ -72,24 +75,36 @@
 		                <ul style="list-style:none;font-style:italic;margin: 15px;padding: 0;">
 		                    <li style = "margin: 0;line-height: 1.7em;">
 								<label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">
-									name:
+									Boot Time:
 								</label>
-								#= name #
+								#= bootTime #
 							</li>
-		                    <li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">message:</label>#= message #</li>
-		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">ip:</label>#= ip #</li>
-		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">status:</label>#= status #</li>						
-							    <div id="chart_div" style="width: 100px; height: 120px;"></div>						
+		                    <li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Guest my:</label>#= guestMemoryUsage #</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Host Mmy:</label>#= hostMemoryUsage #</li>
+		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>						
+							<li style = "margin: 0;line-height: 1.7em;"> 
+							   <span id="gauge-container">
+	                				<span id="gauge" style="display:inline-block;"></span>
+	                				<span style="display:inline-block;" id="osgauge"></span>
+								</span>
+							</li>
 		                </ul>
 		            </div>
 		        </div>
 		    </script>
 		    <script th:inline="javascript">
 		        var vmObj ="";
-		        $(document).ready(function() {  
+		        var templates={
+		        		"os":"Windows",
+		        		"os":"Linux"
+		        };
+		        
+		        
+
+				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
 		        	$.ajax({
-		                url: "/vms",
+		                url: "/api/v1/vms",
 		                success: function (response) {
 		                    // Get default value from the server response
 		                	vmObj=response;
@@ -102,8 +117,41 @@
 		                    console.error("uh oh!");
 		                }
 		            });
+//				     $.ajax({
+//			                url: "/api/v1/templates",
+//			                success: function (response) {
+//			                    // Get default value from the server response
+//			                	templates=response;
+//			                	console.log(templates);
+//			                	createTemplateGrid(templates);
+//			                },
+//			                error: function () {
+//			                    // Stop displaying loading indicator
+//			                    kendo.ui.progress(editEvent.container, false);
+//			                    console.error("uh oh!");
+//			                }
+//			            });
+						createTemplateGrid(templates);
+						var window = $("#popupVM"),
+					createVmButton = $("#createVmButton")
+				                  .bind("click", function() {
+				                      window.data("kendoWindow").open();
+				                  });
+				     if (!window.data("kendoWindow")) {
+				         window.kendoWindow({
+				             width: "600px",
+				             title: "Create VM",
+				             actions: [
+				                 "Pin",
+				                 "Minimize",
+				                 "Maximize",
+				                 "Close"
+				             ],
+				             visible:false
+				         });
+				     }
+				});
 		        	
-		        });
 		        function createGrid(vms) {
 			    	console.log(vms);
 		        	$("#grid").kendoGrid({
@@ -112,10 +160,10 @@
 		                    schema: {
 		                        model: {
 		                            fields: {
-		                                message: { type: "string" },
 		                                name: { type: "string" },
+		                                guestOSName: { type: "string" },
 		                                ip: { type: "string" },
-		                                status: { type: "string" }
+		                                powerState: { type: "string" }
 		                            }
 		                        }
 		                    },
@@ -130,53 +178,141 @@
 		                    numeric: false
 		                },
 		                detailTemplate: kendo.template($("#template").html()),
-		                detailInit: detailInit,
+		                detailExpand: detailExpand,
+//		                detailCollapse: function(e) {
+//		                	kendo.destroy($("#gauge"));
+//		                	kendo.destroy($("#osgauge"));
+//		                },
 	//                        dataBound: function() {
 	//                            this.expandRow(this.tbody.find("tr.k-master-row").first());
 	//                        },
 		                columns: [
 		                    { field: "name", title: "Name", width: "130px" },
-		                    { field: "message", title: "Message", width: "130px" },
+		                    { field: "guestOSName", title: "OS", width: "130px" },
 		                    { field: "ip", title: "IP", width: "130px" },
-		                    { field: "status", title: "Message", width: "130px", template: "#= showColorText(data) #" }
+		                    { field: "powerState", title: "Message", width: "130px", template: "#= showColorText(data) #" }
 		                ]
 		            });
-		        	function detailInit(e) {
-		                var detailRow = e.detailRow;
-		                detailRow.find(".tabstrip").kendoTabStrip({
-		                    animation: {
-		                        open: { effects: "fadeIn" }
-		                    }
-		                });
-		        	}
+		        	
 		        }
-	            google.load("visualization", "1", {packages:["gauge"]});
-	            google.setOnLoadCallback(drawChart);
-	            function drawChart() {
+		        	
+		        function detailExpand(e) {
+		        	console.log(e);
+		        	var grid = $("#grid").data("kendoGrid");
+		        	var data = grid.dataItem("tr:eq(1)");
+		        	console.log(e.masterRow, e.detailRow);					        	
+		        	var detailRow = e.detailRow;
+	                createGauge(150); //e.data.hostMemoryUsage
+	                createOSGauge(325); //e.data.overallCPUUsage
+	                detailRow.find(".tabstrip").kendoTabStrip({
+	                    animation: {
+	                        open: { effects: "fadeIn" }
+	                    }
+	                });
+	        	}
+		        	
+			        function createTemplateGrid(templates) {
+				    	console.log(templates);
+			        	$("#templateGrid").kendoGrid({
+			                dataSource: {
+			                    data: templates,
+			                    schema: {
+			                        model: {
+			                            fields: {
+			                                os: { type: "string" }
+			                            }
+			                        }
+			                    },
+			                    pageSize: 20
+			                },
+			                height: 550,
+			                scrollable: true,
+			                sortable: true,
+			                filterable: true,
+			                pageable: {
+			                    input: true,
+			                    numeric: false
+			                },
+			                columns: [
+		                                { field: "os", title: "OS", width: "130px" },
+		                                { command: { text: "Windows", click: createWindowsVM }, title: " ", width: "180px" },
+		                                { command: { text: "Linux", click: createLinuxVM}, title: " ", width: "180px" }
+			                ]
+			            });
+		        	}
+			        function createWindowsVM() {
+			        	alert("Windows");
+			        }
+			        function createLinuxVM() {
+			        	alert("Linux");
+			        }
 
-		              var data = google.visualization.arrayToDataTable([
-		                ['Label', 'Value'],
-		                ['Memory', 80],
-		                ['CPU', 55],
-		              ]);
+			        
+			        function createGauge(hostMemoryUsage) {
+	                    $("#gauge").kendoRadialGauge({
 
-		              var options = {
-		                width: 400, height: 120,
-		                redFrom: 90, redTo: 100,
-		                yellowFrom:75, yellowTo: 90,
-		                minorTicks: 5
-		              };
+	                        pointer: {
+	                            value: hostMemoryUsage
+	                        },
 
-		              var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+	                        scale: {
+	                            minorUnit: 5,
+	                            startAngle: -30,
+	                            endAngle: 210,
+	                            max: 400,
+	                            width:10,
+	                            ranges: [
+	                                {
+	                                    from: 100,
+	                                    to: 200,
+	                                    color: "#ffc700"
+	                                }, {
+	                                    from: 200,
+	                                    to: 300,
+	                                    color: "#ff7a00"
+	                                }, {
+	                                    from: 300,
+	                                    to: 400,
+	                                    color: "#c20000"
+	                                }
+	                            ]
+	                        }
+	                    });
+	                }
+			        function createOSGauge(overallCPUUsage) {
+	                    $("#osgauge").kendoRadialGauge({
 
-		              chart.draw(data, options);		            
-		              
-		            }
-          	
+	                        pointer: {
+	                            value: overallCPUUsage
+	                        },
 
-				function showColorText(data) {
-					if(data.status=='Green') return '<span style="color:green;">Green</span>';
-					if(data.status=='Red') return '<span style="color:red;">Red</span>';	
+	                        scale: {
+	                            minorUnit: 5,
+	                            startAngle: -30,
+	                            endAngle: 210,
+	                            max: 400,
+	                            width:10,
+	                            ranges: [
+	                                {
+	                                    from: 100,
+	                                    to: 200,
+	                                    color: "#ffc700"
+	                                }, {
+	                                    from: 200,
+	                                    to: 300,
+	                                    color: "#ff7a00"
+	                                }, {
+	                                    from: 300,
+	                                    to: 400,
+	                                    color: "#c20000"
+	                                }
+	                            ]
+	                        }
+	                    });
+	                }			        
+			        function showColorText(data) {
+					if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
+					if(data.powerState=='poweredOff') return '<span style="color:red;">Stopped</span>';	
 				}
 		        </script>            
 		    </div>
