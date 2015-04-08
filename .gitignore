@@ -27,3 +27,6 @@ local.properties
 
 .settings/
 gradle*
+.gradle/*
+.idea/*
+
