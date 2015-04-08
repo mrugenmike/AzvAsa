@@ -8,7 +8,7 @@ target/
 build/*
 .DS_Store 
 *.class
-
+.idea*
 *.pydevproject
 .project
 .metadata
@@ -26,4 +26,7 @@ local.properties
 /src/main/resources/rebel.xml
 
 .settings/
-.gradle
+gradle*
+.gradle/*
+.idea/*
+

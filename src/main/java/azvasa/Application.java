@@ -1,4 +1,4 @@
-package azvasa.controller;
+package azvasa;
 
 import com.vmware.vim25.mo.ServiceInstance;
 import org.springframework.beans.factory.annotation.Value;
