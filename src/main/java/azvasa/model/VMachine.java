@@ -30,7 +30,15 @@ public class VMachine {
     private int  guestMemoryUsage;
     private String ip;
 
-    public String getName() {
+    public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getName() {
         return name;
     }
 
@@ -82,7 +90,7 @@ public class VMachine {
     private int  overallCPUUsage;
 
 
-    public VMachine(String name, String powerState, String bootTime, String guestOSName, String guestID, String version,List<String> networks,List<String> hosts,int guestMemoryUsage,int hostMemoryUsage,int overallCPUUsage,List<String> datastores) {
+    public VMachine(String name, String powerState, String bootTime, String guestOSName, String guestID, String version,List<String> networks,List<String> hosts,int guestMemoryUsage,int hostMemoryUsage,int overallCPUUsage,List<String> datastores, String ip) {
         this.name = name;
         this.powerState = powerState;
         this.bootTime = bootTime;
@@ -94,13 +102,14 @@ public class VMachine {
         this.guestMemoryUsage=guestMemoryUsage;
         this.hostMemoryUsage=hostMemoryUsage;
         this.overallCPUUsage=overallCPUUsage;
-
         this.datastores = datastores;
+        this.ip = ip;
     }
 
     public static VMachine instance(VirtualMachine virtualMachine) {
         VirtualMachineRuntimeInfo vmri = (VirtualMachineRuntimeInfo) virtualMachine.getRuntime();
-        VirtualMachineConfigInfo congif= virtualMachine.getConfig();
+    
+        VirtualMachineConfigInfo congif= virtualMachine.getConfig();        
          List<Network> networks= new ArrayList<Network>();
         try {
             networks = Arrays.asList(virtualMachine.getNetworks());
@@ -145,6 +154,6 @@ public class VMachine {
         if(datastores1!=null){
             Arrays.asList(datastores1).stream().forEach(store->dataStoreNames.add(store.getName()));
         }
-        return new VMachine(vmachineName,vmri.getPowerState().name(), bootTime, guestFullName, guestId, version1,networknames,hosts, guestMemoryUsage1, hostMemoryUsage1, overallCpuUsage,dataStoreNames);
+        return new VMachine(vmachineName,vmri.getPowerState().name(), bootTime, guestFullName, guestId, version1,networknames,hosts, guestMemoryUsage1, hostMemoryUsage1, overallCpuUsage,dataStoreNames,virtualMachine.getGuest().getIpAddress());
     }
 }
