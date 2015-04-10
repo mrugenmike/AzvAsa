@@ -1,2 +1,10 @@
 create database azvasa;
 use azvasa;
+
+//-------create uses table
+CREATE TABLE `azvasa`.`users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `user_name` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`id`));
