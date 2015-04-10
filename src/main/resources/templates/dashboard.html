@@ -241,10 +241,36 @@
 			            });
 		        	}
 			        function createWindowsVM() {
-			        	alert("Windows");
+                            $.ajax({
+                            url: "/api/v1/vms/create/windows",
+                            success: function (response) {
+                                // Get default value from the server response
+                                vmObj=response;
+                                console.log(vmObj);
+                                createGrid(vmObj);
+                            },
+                            error: function () {
+                                // Stop displaying loading indicator
+                                kendo.ui.progress(editEvent.container, false);
+                                console.error("uh oh!");
+                            }
+                        });
 			        }
 			        function createLinuxVM() {
-			        	alert("Linux");
+                            $.ajax({
+                            url: "/api/v1/vms/create/linux",
+                            success: function (response) {
+                                // Get default value from the server response
+                                vmObj=response;
+                                console.log(vmObj);
+                                createGrid(vmObj);
+                            },
+                            error: function () {
+                                // Stop displaying loading indicator
+                                kendo.ui.progress(editEvent.container, false);
+                                console.error("uh oh!");
+                            }
+                        });
 			        }
 
 			        

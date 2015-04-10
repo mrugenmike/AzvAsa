@@ -69,4 +69,18 @@ public class VMController {
         vmService.powerOffVM(vmName);
         return new ResponseEntity<String>(HttpStatus.OK);
     }
+
+    @RequestMapping(value = {"/vms/create/{vm-type}"}, method = RequestMethod.GET)
+    public ResponseEntity<String> createVm(@PathVariable("vm-type") String vmType) throws RemoteException, InterruptedException {
+       String vmName = "new_"+vmType+"_vm";
+        //TODO: also allow user to specify the VM name ?
+        try {
+            //vmType: linx , windows
+            vmService.deployVM(vmType,vmName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
 }
