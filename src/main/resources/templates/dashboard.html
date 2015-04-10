@@ -84,8 +84,12 @@
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>						
 							<li style = "margin: 0;line-height: 1.7em;"> 
 							   <span id="gauge-container">
-	                				<span id="gauge" style="display:inline-block;"></span>
-	                				<span style="display:inline-block;" id="osgauge"></span>
+	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
+	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
+								</span>
+							   <span id="gauge-label" style= "display:block;">
+	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
+	                				<span style="display:inline-block;" id="osgauge">CPUUsage</span>
 								</span>
 							</li>
 		                </ul>
@@ -179,13 +183,6 @@
 		                },
 		                detailTemplate: kendo.template($("#template").html()),
 		                detailExpand: detailExpand,
-//		                detailCollapse: function(e) {
-//		                	kendo.destroy($("#gauge"));
-//		                	kendo.destroy($("#osgauge"));
-//		                },
-	//                        dataBound: function() {
-	//                            this.expandRow(this.tbody.find("tr.k-master-row").first());
-	//                        },
 		                columns: [
 		                    { field: "name", title: "Name", width: "130px" },
 		                    { field: "guestOSName", title: "OS", width: "130px" },
@@ -197,13 +194,15 @@
 		        }
 		        	
 		        function detailExpand(e) {
-		        	console.log(e);
+		        	console.log(e.detailRow[0].rowIndex);
 		        	var grid = $("#grid").data("kendoGrid");
-		        	var data = grid.dataItem("tr:eq(1)");
-		        	console.log(e.masterRow, e.detailRow);					        	
+		        	var rowId = e.detailRow[0].rowIndex
+		        	var data = grid.dataItem("tr:eq("+rowId+")");
 		        	var detailRow = e.detailRow;
-	                createGauge(150); //e.data.hostMemoryUsage
-	                createOSGauge(325); //e.data.overallCPUUsage
+		        	console.log(data.hostMemoryUsage);
+		        	console.log(data.overallCPUUsage);
+	                createGauge(data.hostMemoryUsage, data.name);
+	                createOSGauge(data.overallCPUUsage, data.name);
 	                detailRow.find(".tabstrip").kendoTabStrip({
 	                    animation: {
 	                        open: { effects: "fadeIn" }
@@ -234,7 +233,7 @@
 			                    numeric: false
 			                },
 			                columns: [
-		                                { field: "os", title: "OS", width: "130px" },
+		                                { field: "os", title: "OS", width: "130px", hidden:true },
 		                                { command: { text: "Windows", click: createWindowsVM }, title: " ", width: "180px" },
 		                                { command: { text: "Linux", click: createLinuxVM}, title: " ", width: "180px" }
 			                ]
@@ -274,62 +273,62 @@
 			        }
 
 			        
-			        function createGauge(hostMemoryUsage) {
-	                    $("#gauge").kendoRadialGauge({
+			        function createGauge(hostMemoryUsage, name) {
+	                    $("#gauge"+name).kendoRadialGauge({
 
 	                        pointer: {
 	                            value: hostMemoryUsage
 	                        },
 
 	                        scale: {
-	                            minorUnit: 5,
-	                            startAngle: -30,
-	                            endAngle: 210,
-	                            max: 400,
+//	                            minorUnit: 5,
+//	                            startAngle: -30,
+//	                            endAngle: 210,
+	                            max: 1000,
 	                            width:10,
 	                            ranges: [
 	                                {
 	                                    from: 100,
-	                                    to: 200,
+	                                    to: 300,
 	                                    color: "#ffc700"
 	                                }, {
-	                                    from: 200,
-	                                    to: 300,
+	                                    from: 300,
+	                                    to: 600,
 	                                    color: "#ff7a00"
 	                                }, {
-	                                    from: 300,
-	                                    to: 400,
+	                                    from: 600,
+	                                    to: 1000,
 	                                    color: "#c20000"
 	                                }
 	                            ]
 	                        }
 	                    });
 	                }
-			        function createOSGauge(overallCPUUsage) {
-	                    $("#osgauge").kendoRadialGauge({
+			        function createOSGauge(overallCPUUsage, name) {
+	                    $("#osgauge"+name).kendoRadialGauge({
 
 	                        pointer: {
 	                            value: overallCPUUsage
 	                        },
 
 	                        scale: {
-	                            minorUnit: 5,
-	                            startAngle: -30,
-	                            endAngle: 210,
-	                            max: 400,
-	                            width:10,
+//	                            minorUnit: 5,
+//	                            startAngle: -30,
+//	                            endAngle: 210,
+	                            max: 1000,
+	                            width:20,
 	                            ranges: [
 	                                {
 	                                    from: 100,
-	                                    to: 200,
+	                                    to: 300,
 	                                    color: "#ffc700"
 	                                }, {
-	                                    from: 200,
-	                                    to: 300,
+	                                    from: 300,
+	                                    to: 600,
 	                                    color: "#ff7a00"
 	                                }, {
-	                                    from: 300,
-	                                    to: 400,
+	                                    from: 600,
+	                                    to: 1000,
 	                                    color: "#c20000"
 	                                }
 	                            ]
