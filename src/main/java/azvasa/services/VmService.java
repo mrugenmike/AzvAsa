@@ -128,19 +128,18 @@ public class VmService {
     public JSONObject getStats(String vmName) throws RemoteException, InterruptedException {
         JSONObject json= new JSONObject();
 
-        String sql1 = "SELECT overall_cpu_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        String sql1 = "SELECT overall_cpu_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' ORDER BY id LIMIT 12";
         List<String> cpu_usage = template.queryForList(sql1,String.class);
         json.put("cpu_usage", cpu_usage);
 
-        String sql2 = "SELECT guest_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        String sql2 = "SELECT guest_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' ORDER BY id LIMIT 12";
         List<String> guest_memory_usage = template.queryForList(sql2, String.class);
         json.put("guest_memory_usage", guest_memory_usage);
 
-        String sql3 = "SELECT host_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        String sql3 = "SELECT host_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' ORDER BY id LIMIT 12";
         List<String> host_memory_usage = template.queryForList(sql3, String.class);
         json.put("host_memory_usage", host_memory_usage);
 
         return json;
     }
-
 }

@@ -17,8 +17,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class collectStatistics {
 	@Autowired
 	JdbcTemplate template;
@@ -26,7 +27,7 @@ public class collectStatistics {
 	 @Autowired
 	 ServiceInstance serviceInstance;
 
-	@Scheduled(fixedRate = 300000)
+	@Scheduled(fixedRate = 100000)
 	public void work() throws Exception {
 		try
 		{
@@ -44,7 +45,7 @@ public class collectStatistics {
 				System.out.println("Overall CPU usage: " + stas.overallCpuUsage);
 
 				//insert into Database
-				String stats = String.format("insert into stats VALUES('%s','%s','%s','%s')",vm.getName(),stas.overallCpuUsage,stas.guestMemoryUsage,stas.hostMemoryUsage);
+				String stats = String.format("insert into stats(vm_name,overall_cpu_usage,guest_memory_usage,host_memory_usage) VALUES('%s','%s','%s','%s')",vm.getName(),stas.overallCpuUsage,stas.guestMemoryUsage,stas.hostMemoryUsage);
 				template.execute(stats);
 			}
 		}

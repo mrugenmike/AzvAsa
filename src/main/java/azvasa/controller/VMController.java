@@ -2,6 +2,7 @@ package azvasa.controller;
 
 import azvasa.model.VMachine;
 import azvasa.services.VmService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -85,15 +86,10 @@ public class VMController {
     }
 
     @RequestMapping(value = {"/getStats/{vmName}"}, method = RequestMethod.GET)
-    public ResponseEntity<String> GetVMStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {
-        try 
-        {
-            vmService.getStats(vmName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new ResponseEntity<String>(HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public JSONObject GetVMStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {
+            return vmService.getStats(vmName);
     }
 
 }
