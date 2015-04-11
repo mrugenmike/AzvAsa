@@ -8,3 +8,6 @@ CREATE TABLE `azvasa`.`users` (
   `user_name` VARCHAR(45) NOT NULL,
   `password` VARCHAR(20) NOT NULL,
   PRIMARY KEY (`id`));
+
+ALTER TABLE `azvasa`.`users`
+ADD UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC);
