@@ -55,7 +55,10 @@
 		</div>
 	</div> 
 	<div  class="dashbrd" style="margin-top:5%;">
-	
+	   <span>
+         <span style="display:inline-block;">Hey</span>
+         <span style="display:inline-block;" id="username" th:text="${username}"></span>
+		</span>
 		<div>
 			<button id="createVmButton" class="k-primary">Create VM</button>
 		</div>
@@ -112,12 +115,12 @@
 
 				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
+		        	var username = [[${username}]];
 		        	getDetails();
 //		        	var auto_refresh = setInterval(getDetails, 50000);
 		        	function getDetails() {
-		        		console.log("NOW");
 		        		$.ajax({
-			                url: "/api/v1/vms",
+			                url: "/api/v1/vms"+username,
 			                success: function (response) {
 			                    // Get default value from the server response
 			                	vmObj=response;
@@ -196,8 +199,6 @@
 		        	var rowId = e.detailRow[0].rowIndex
 		        	var data = grid.dataItem("tr:eq("+rowId+")");
 		        	var detailRow = e.detailRow;
-		        	console.log(data.hostMemoryUsage);
-		        	console.log(data.overallCPUUsage);
 	                createGauge(data.hostMemoryUsage, data.name);
 	                createOSGauge(data.overallCPUUsage, data.name);
 	                
@@ -255,7 +256,7 @@
 		        	}
 			        function createWindowsVM() {
                             $.ajax({
-                            url: "/api/v1/vms/create/windows",
+                            url: "/api/v1/vms/create/windows"+username,
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
@@ -270,7 +271,7 @@
 			        }
 			        function createLinuxVM() {
                             $.ajax({
-                            url: "/api/v1/vms/create/linux",
+                            url: "/api/v1/vms/create/linux"+username,
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
