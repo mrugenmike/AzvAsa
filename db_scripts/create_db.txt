@@ -20,7 +20,6 @@ vm_name VARCHAR(200) NOT NULL,
 overall_cpu_usage VARCHAR(200) NOT NULL,
 guest_memory_usage VARCHAR(200) NOT NULL,
 host_memory_usage VARCHAR(200) NOT NULL,
-time_of_entry VARCHAR(200) NOT NULL,
 PRIMARY KEY(id)
 );
 
