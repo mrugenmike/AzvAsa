@@ -37,10 +37,10 @@ public class VMController {
     @Autowired
     VmService vmService;
         
-    @RequestMapping(value = "/vms", method=RequestMethod.GET)
+    @RequestMapping(value = "/vms/{userName}", method=RequestMethod.GET)
     @ResponseBody
-    public List<VMachine>  getVms() throws RemoteException {
-        List<VMachine> allVirtualMachines = vmService.getAllVirtualMachines();
+    public List<VMachine>  getVms(@PathVariable String userName) throws RemoteException {
+        List<VMachine> allVirtualMachines = vmService.getAllVirtualMachines(userName);
         if(allVirtualMachines==null||allVirtualMachines.isEmpty()){
             throw new NoContentException("No Virtual Machines Found!");
         }

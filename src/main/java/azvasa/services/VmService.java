@@ -43,10 +43,16 @@ public class VmService {
     String windowsTemplate;
 
 
-    public List<VMachine> getAllVirtualMachines() throws RemoteException {
-        Folder rootFolder = serviceInstance.getRootFolder();
-        ManagedEntity[] vms = new InventoryNavigator(rootFolder).searchManagedEntities(new String[][] { {"VirtualMachine", "name" }, }, true);
-        return Arrays.asList(vms).stream().map(virtualMachine -> ((VirtualMachine) virtualMachine)).map(vm-> instance(vm)).collect(Collectors.toList());
+    public List<VMachine> getAllVirtualMachines(String userName) throws RemoteException {
+        final List<VMEntry> vmEntries = vmRepository.findBy(userName);
+        if(vmEntries!=null && !vmEntries.isEmpty()){
+            final List<String> vmnames = vmEntries.stream().map(vmEntry -> vmEntry.getVmName()).collect(Collectors.toList());
+            Folder rootFolder = serviceInstance.getRootFolder();
+            ManagedEntity[] vms = new InventoryNavigator(rootFolder).searchManagedEntities(new String[][] { {"VirtualMachine", "name" }, }, true);
+            final List<VMachine> vMachines = Arrays.asList(vms).stream().map(virtualMachine -> ((VirtualMachine) virtualMachine)).filter(virtualMachine -> vmnames.contains(virtualMachine.getName())).map(vm -> instance(vm)).collect(Collectors.toList());
+            return vMachines;
+        }
+        return null;
         }
 
     public void powerOnVM(String vmName) throws RemoteException, InterruptedException {
