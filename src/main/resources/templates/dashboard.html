@@ -86,7 +86,7 @@
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>						
 							<li style = "margin: 0;line-height: 1.7em;width:50%;"> 
 							   <span id="gauge-container">
-	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
+	                				<span id="gauge#= name #" style="display:inline-block;">HostMemory</span>
 	                				<span style="display:inline-block;float:right;" id="osgauge#= name #">CPUUsage</span>
 								</span>
 							   <span id="gauge-label" style= "display:block;">
@@ -95,7 +95,7 @@
 								</span>
 							</li>
 							<li style = "margin: 0;line-height: 1.7em;"> 
-								<div id="graphContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+								<div id="graphContainer#= name #" style="width:90%;float:center;"></div>
 							</li>
 		                </ul>
 		            </div>
@@ -113,7 +113,7 @@
 				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
 		        	getDetails();
-		        	var auto_refresh = setInterval(getDetails, 50000);
+//		        	var auto_refresh = setInterval(getDetails, 50000);
 		        	function getDetails() {
 		        		console.log("NOW");
 		        		$.ajax({
@@ -200,7 +200,23 @@
 		        	console.log(data.overallCPUUsage);
 	                createGauge(data.hostMemoryUsage, data.name);
 	                createOSGauge(data.overallCPUUsage, data.name);
-	                createGraphHistory();
+	                
+	                $.ajax({
+		                url: "/api/v1/getStats/"+data.name,
+		                success: function (response) {
+		                    // Get default value from the server response
+		                	var stats=response;
+		                    console.log(stats);
+			                createGraphHistory(stats, data.name);
+		                },
+		                error: function () {
+		                    // Stop displaying loading indicator
+		                    kendo.ui.progress(editEvent.container, false);
+		                    console.error("uh oh!");
+		                }
+		            });
+	                
+	                
 	                detailRow.find(".tabstrip").kendoTabStrip({
 	                    animation: {
 	                        open: { effects: "fadeIn" }
@@ -363,8 +379,8 @@
 	                        }
 	                    });
 	                }	
-			        function createGraphHistory() {
-			        	$('#graphContainer').highcharts({
+			        function createGraphHistory(stats, vmName) {
+			        	$('#graphContainer'+vmName).highcharts({
 			        		 chart: {
 			        	            type: 'spline'
 			        	        },
@@ -378,7 +394,7 @@
 			                },
 			                yAxis: {
 			                    title: {
-			                        text: 'Memory'
+			                        text: 'Units'
 			                    },
 			                    floor:100,
 			                    ceiling:1000,
@@ -394,11 +410,16 @@
 //			                },
 			                series: [{
 			                    name: 'Host Memory',
-			                    data: [50,100,160,170,500,666,990]
-			                }, {
+			                    data: stats.host_memory_usage
+			                }
+			                , {
 			                    name: 'CPU Memory',
-			                    data: [12,21,654,123,87,9,123,768,122]
-			                }]
+			                    data: stats.cpu_usage
+			                }, {
+			                    name: 'Guest Memory',
+			                    data: stats.guest_memory_usage
+			                }
+			                ]
 			            });
 			        }
 			        function showColorText(data) {
