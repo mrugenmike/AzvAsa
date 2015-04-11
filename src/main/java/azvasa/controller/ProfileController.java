@@ -27,6 +27,7 @@ public class ProfileController {
         try {
             signupService.signUpUser(user);
         } catch (SignUpException ex) {
+        	ex.printStackTrace();
             model.setViewName("signup");
             model.addObject("error",ex.getMessage());
             return model;

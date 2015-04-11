@@ -31,6 +31,8 @@ public class NavigationController {
     }
     @RequestMapping(value ="/dashboard", method=RequestMethod.POST)
 	public String checkLoggedInUser(@ModelAttribute User user, Model model, HttpServletRequest req) {
+    	System.out.println(user.getUserName());
+    	System.out.println(user.getPassword());
     	if(user.getUserName().equals("admin") && user.getPassword().equals("password")) {
     		return "dashboard";
     	}

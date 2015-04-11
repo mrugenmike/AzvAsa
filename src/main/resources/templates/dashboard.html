@@ -84,8 +84,18 @@
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>						
 							<li style = "margin: 0;line-height: 1.7em;"> 
 							   <span id="gauge-container">
-	                				<span id="gauge#= userName #" style="display:inline-block;">HostMMy</span>
-	                				<span style="display:inline-block;" id="osgauge#= userName #">CPUUsage</span>
+	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
+	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
+								</span>
+							   <span id="gauge-label" style= "display:block;">
+	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
+	                				<span style="display:inline-block;" id="osgauge">CPUUsage</span>
+								</span>
+							</li>
+							<li style = "margin: 0;line-height: 1.7em;"> 
+							   <span id="gauge-container">
+	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
+	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
 								</span>
 							   <span id="gauge-label" style= "display:block;">
 	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
@@ -121,20 +131,6 @@
 		                    console.error("uh oh!");
 		                }
 		            });
-//				     $.ajax({
-//			                url: "/api/v1/templates",
-//			                success: function (response) {
-//			                    // Get default value from the server response
-//			                	templates=response;
-//			                	console.log(templates);
-//			                	createTemplateGrid(templates);
-//			                },
-//			                error: function () {
-//			                    // Stop displaying loading indicator
-//			                    kendo.ui.progress(editEvent.container, false);
-//			                    console.error("uh oh!");
-//			                }
-//			            });
 						createTemplateGrid(templates);
 						var window = $("#popupVM"),
 					createVmButton = $("#createVmButton")
@@ -164,7 +160,7 @@
 		                    schema: {
 		                        model: {
 		                            fields: {
-		                                userName: { type: "string" },
+		                                name: { type: "string" },
 		                                guestOSName: { type: "string" },
 		                                ip: { type: "string" },
 		                                powerState: { type: "string" }
@@ -185,7 +181,7 @@
 		                detailTemplate: kendo.template($("#template").html()),
 		                detailExpand: detailExpand,
 		                columns: [
-		                    { field: "userName", title: "Name", width: "130px" },
+		                    { field: "name", title: "Name", width: "130px" },
 		                    { field: "guestOSName", title: "OS", width: "130px" },
 		                    { field: "ip", title: "IP", width: "130px" },
 		                    { field: "powerState", title: "Message", width: "130px", template: "#= showColorText(data) #" },
@@ -204,8 +200,8 @@
 		        	var detailRow = e.detailRow;
 		        	console.log(data.hostMemoryUsage);
 		        	console.log(data.overallCPUUsage);
-	                createGauge(data.hostMemoryUsage, data.userName);
-	                createOSGauge(data.overallCPUUsage, data.userName);
+	                createGauge(data.hostMemoryUsage, data.name);
+	                createOSGauge(data.overallCPUUsage, data.name);
 	                detailRow.find(".tabstrip").kendoTabStrip({
 	                    animation: {
 	                        open: { effects: "fadeIn" }
