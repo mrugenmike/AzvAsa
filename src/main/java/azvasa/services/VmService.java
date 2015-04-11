@@ -1,6 +1,8 @@
 package azvasa.services;
 
+import azvasa.model.VMEntry;
 import azvasa.model.VMachine;
+import azvasa.repository.VMRepository;
 import com.vmware.vim25.VirtualMachineCloneSpec;
 import com.vmware.vim25.VirtualMachinePowerState;
 import com.vmware.vim25.VirtualMachineRelocateSpec;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.json.simple.JSONObject;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,9 @@ public class VmService {
 
     @Autowired
     ServiceInstance serviceInstance;
+
+    @Autowired
+    VMRepository vmRepository;
 
     @Value("${linux.template}")
     String linuxTemplate;
@@ -79,9 +85,8 @@ public class VmService {
         }
     }
 
-    public void deployVM(String type, String vmName) throws Exception{
+    public void deployVM(String type, String vmName, String userName) throws Exception{
         String templateName = type.equals("linux")?linuxTemplate:windowsTemplate;
-        //String templateName = "VM-CLI-01";
         System.out.println("Deploying VM with Template: "+templateName);
         Folder rootFolder = serviceInstance.getRootFolder();
         VirtualMachine vm = (VirtualMachine) new InventoryNavigator(
@@ -115,9 +120,10 @@ public class VmService {
                 vmName, cloneSpec);
         System.out.println("Launching the VM clone task. " +
                 "Please wait ...");
-        String status = task.waitForMe();
+        String status = task.waitForTask();
         if(status==Task.SUCCESS){
             System.out.println("VM got cloned successfully.");
+            vmRepository.storeVMEntry(new VMEntry(userName,vmName,new Date()));
         }
         else {
             System.out.println("Failure -: VM cannot be cloned");

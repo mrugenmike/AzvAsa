@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +27,6 @@ import azvasa.model.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -71,13 +70,13 @@ public class VMController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = {"/vms/create/{vm-type}"}, method = RequestMethod.GET)
-    public ResponseEntity<String> createVm(@PathVariable("vm-type") String vmType) throws RemoteException, InterruptedException {
-       String vmName = "new_"+vmType+"_vm";
-        //TODO: also allow user to specify the VM name ?
+    @RequestMapping(value = {"/vms/create/{vm-type}/{userName}"}, method = RequestMethod.GET)
+    public ResponseEntity<String> createVm(@PathVariable("vm-type") String vmType,@PathVariable String userName) throws RemoteException, InterruptedException {
+        final String timeStamp = new Long(new Date().getTime()).toString();
+        String vmName = String.format("%s_%s_%s", vmType, userName, timeStamp.substring(timeStamp.length()-4,timeStamp.length()));
         try {
             //vmType: linx , windows
-            vmService.deployVM(vmType,vmName);
+            vmService.deployVM(vmType,vmName,userName);
         } catch (Exception e) {
             e.printStackTrace();
         }

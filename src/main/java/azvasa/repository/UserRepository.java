@@ -23,10 +23,6 @@ public class UserRepository {
     }
 
     public void save(User user) throws SignUpException{
-    	System.out.println("******"+user.getId());
-    	System.out.println("******"+user.getName());
-    	System.out.println("******"+user.getUserName());
-    	System.out.println("******"+user.getPassword());
         String insertUser = String.format("insert into users VALUES(%d,'%s','%s','%s')",user.getId(),user.getName(),user.getUserName(),user.getPassword());
         try {
             template.execute(insertUser);
