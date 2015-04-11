@@ -40,11 +40,15 @@ public class UserRepository {
 
     public User findByUsername(String username) {
         String findByUserName = String.format("select * from users where user_name='%s'",username);
-        return template.queryForObject(findByUserName, new RowMapper<User>() {
-            @Override
-            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new User(rs.getInt("id"),rs.getString("name"),rs.getString("user_name"),rs.getString("password"));
-            }
-        });
+        try{
+            final User user = template.queryForObject(findByUserName, new RowMapper<User>() {
+                @Override
+                public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    return new User(rs.getInt("id"), rs.getString("name"), rs.getString("user_name"), rs.getString("password"));
+                }
+            });
+            return user;
+        }catch(Exception e){}
+        return null;
     }
 }
