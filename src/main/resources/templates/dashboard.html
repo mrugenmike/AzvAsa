@@ -37,8 +37,10 @@
 	<script src="assets/js/jQuery.headroom.min.js"></script>
 	<script src="assets/js/template.js"></script>
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
- 	<body>
-	
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script> 	
+
+	<body>
 	<div class="navbar navbar-inverse navbar-fixed-top headroom" >
 		<div class="container">
 			<div class="navbar-header">
@@ -82,25 +84,18 @@
 		                    <li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Guest my:</label>#= guestMemoryUsage #</li>
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Host Mmy:</label>#= hostMemoryUsage #</li>
 		                    <li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>						
-							<li style = "margin: 0;line-height: 1.7em;"> 
+							<li style = "margin: 0;line-height: 1.7em;width:50%;"> 
 							   <span id="gauge-container">
 	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
-	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
+	                				<span style="display:inline-block;float:right;" id="osgauge#= name #">CPUUsage</span>
 								</span>
 							   <span id="gauge-label" style= "display:block;">
-	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
-	                				<span style="display:inline-block;" id="osgauge">CPUUsage</span>
+	                				<span id="" style="display:inline-block;margin-left:10%;width:17%;">HostMemory</span>
+	                				<span style="display:inline-block;float:right;margin-right:10%;" id="osgauge">CPUUsage</span>
 								</span>
 							</li>
 							<li style = "margin: 0;line-height: 1.7em;"> 
-							   <span id="gauge-container">
-	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
-	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
-								</span>
-							   <span id="gauge-label" style= "display:block;">
-	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
-	                				<span style="display:inline-block;" id="osgauge">CPUUsage</span>
-								</span>
+								<div id="graphContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 							</li>
 		                </ul>
 		            </div>
@@ -117,27 +112,31 @@
 
 				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
-		        	$.ajax({
-		                url: "/api/v1/vms",
-		                success: function (response) {
-		                    // Get default value from the server response
-		                	vmObj=response;
-		                	console.log(vmObj);
-		                	createGrid(vmObj);
-		                },
-		                error: function () {
-		                    // Stop displaying loading indicator
-		                    kendo.ui.progress(editEvent.container, false);
-		                    console.error("uh oh!");
-		                }
-		            });
+		        	getDetails();
+		        	var auto_refresh = setInterval(getDetails, 50000);
+		        	function getDetails() {
+		        		console.log("NOW");
+		        		$.ajax({
+			                url: "/api/v1/vms",
+			                success: function (response) {
+			                    // Get default value from the server response
+			                	vmObj=response;
+			                	console.log(vmObj);
+			                	createGrid(vmObj);
+			                },
+			                error: function () {
+			                    // Stop displaying loading indicator
+			                    kendo.ui.progress(editEvent.container, false);
+			                    console.error("uh oh!");
+			                }
+			            });
 						createTemplateGrid(templates);
 						var window = $("#popupVM"),
-					createVmButton = $("#createVmButton")
+						createVmButton = $("#createVmButton")
 				                  .bind("click", function() {
 				                      window.data("kendoWindow").open();
 				                  });
-				     if (!window.data("kendoWindow")) {
+				     	if (!window.data("kendoWindow")) {
 				         window.kendoWindow({
 				             width: "600px",
 				             title: "Create VM",
@@ -149,11 +148,11 @@
 				             ],
 				             visible:false
 				         });
-				     }
+				     	}
+		        	}
 				});
 		        	
 		        function createGrid(vms) {
-			    	console.log(vms);
 		        	$("#grid").kendoGrid({
 		                dataSource: {
 		                    data: vms,
@@ -189,11 +188,10 @@
                             { command: { text: "PowerOff", click: stopVM}, title: " ", width: "180px"}		                    
 		                    ]
 		            });
-		        	
 		        }
 		        	
 		        function detailExpand(e) {
-		        	console.log(e.detailRow[0].rowIndex);
+		        	console.log('rowindex '+e.detailRow[0].rowIndex);
 		        	var grid = $("#grid").data("kendoGrid");
 		        	var rowId = e.detailRow[0].rowIndex
 		        	var data = grid.dataItem("tr:eq("+rowId+")");
@@ -202,6 +200,7 @@
 		        	console.log(data.overallCPUUsage);
 	                createGauge(data.hostMemoryUsage, data.name);
 	                createOSGauge(data.overallCPUUsage, data.name);
+	                createGraphHistory();
 	                detailRow.find(".tabstrip").kendoTabStrip({
 	                    animation: {
 	                        open: { effects: "fadeIn" }
@@ -244,7 +243,6 @@
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
-                                console.log(vmObj);
                                 createGrid(vmObj);
                             },
                             error: function () {
@@ -260,7 +258,6 @@
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
-                                console.log(vmObj);
                                 createGrid(vmObj);
                             },
                             error: function () {
@@ -272,7 +269,6 @@
 			        }
 			        function startVM(e) {
 			        	var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-			        	console.log(dataItem.name);
 			        	var vmName = dataItem.name;
 			        	$.ajax({
 			        		type: "POST",
@@ -291,7 +287,6 @@
 			        
 			        function stopVM(e) {
 			        	var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-			        	console.log(dataItem.name);
 			        	var vmName = dataItem.name;
 			        	$.ajax({
 			        		type: "POST",
@@ -348,9 +343,6 @@
 	                        },
 
 	                        scale: {
-//	                            minorUnit: 5,
-//	                            startAngle: -30,
-//	                            endAngle: 210,
 	                            max: 1000,
 	                            width:20,
 	                            ranges: [
@@ -371,6 +363,44 @@
 	                        }
 	                    });
 	                }	
+			        function createGraphHistory() {
+			        	$('#graphContainer').highcharts({
+			        		 chart: {
+			        	            type: 'spline'
+			        	        },
+			        	        title: {
+			                    text: 'Memory Usage',
+			                    x: -20 //center
+			                },
+			                xAxis: {
+			                    categories: ['5', '10', '15', '20', '25', '30',
+			                        '35', '40', '45', '50']
+			                },
+			                yAxis: {
+			                    title: {
+			                        text: 'Memory'
+			                    },
+			                    floor:100,
+			                    ceiling:1000,
+			                },
+			                tooltip: {
+			                    valueSuffix: 'units'
+			                },
+//			                legend: {
+//			                    layout: 'vertical',
+//			                    align: 'right',
+//			                    verticalAlign: 'middle',
+//			                    borderWidth: 0
+//			                },
+			                series: [{
+			                    name: 'Host Memory',
+			                    data: [50,100,160,170,500,666,990]
+			                }, {
+			                    name: 'CPU Memory',
+			                    data: [12,21,654,123,87,9,123,768,122]
+			                }]
+			            });
+			        }
 			        function showColorText(data) {
 						if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
 						if(data.powerState=='poweredOff') return '<span style="color:red;">Stopped</span>';	
