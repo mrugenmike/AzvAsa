@@ -4,6 +4,7 @@ import azvasa.model.User;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,9 @@ public class UserRepository {
             template.execute(insertUser);
         }
         catch (Exception e) {
-           throw new SignUpException(e.getMessage());
+            if(e instanceof DuplicateKeyException)
+                    throw new SignUpException("Username is Already taken");
+            else throw new SignUpException("Unknown error occured, please signup again");
         }
     }
 }
