@@ -119,4 +119,12 @@ public class VmService {
         }
 
     }
+    
+    
+    public void getStats(String vmName) throws RemoteException, InterruptedException {
+        
+    	//query database for the vmName entry overtime
+    	
+    }
+
 }
