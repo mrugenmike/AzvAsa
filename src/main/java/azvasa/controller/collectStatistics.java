@@ -27,7 +27,7 @@ public class collectStatistics {
 	 @Autowired
 	 ServiceInstance serviceInstance;
 
-	@Scheduled(fixedRate = 100000)
+	@Scheduled(fixedRate = 300000)
 	public void work() throws Exception {
 		try
 		{
