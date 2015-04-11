@@ -83,12 +83,12 @@ public class VMController {
 
         return new ResponseEntity<String>(HttpStatus.OK);
     }
-    
 
     @RequestMapping(value = {"/getStats/{vmName}"}, method = RequestMethod.GET)
     public ResponseEntity<String> GetVMStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {
-        try {
-            vmService.getStats(vmType,vmName);
+        try 
+        {
+            vmService.getStats(vmName);
         } catch (Exception e) {
             e.printStackTrace();
         }

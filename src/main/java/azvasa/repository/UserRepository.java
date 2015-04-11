@@ -35,7 +35,7 @@ public class UserRepository {
             if(e instanceof DuplicateKeyException)
                     throw new SignUpException("Username is Already taken");
             else throw new SignUpException("Unknown error occured, please signup again");
-        }
+       }
     }
 
     public User findByUsername(String username) {

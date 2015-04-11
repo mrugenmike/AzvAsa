@@ -9,18 +9,23 @@ import com.vmware.vim25.mo.*;
 import com.vmware.vim25.mo.VirtualMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
+import org.json.simple.JSONObject;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 import static azvasa.model.VMachine.instance;
 
 
 @Component
 public class VmService {
+
+    @Autowired
+    JdbcTemplate template;
 
     @Autowired
     ServiceInstance serviceInstance;
@@ -120,11 +125,22 @@ public class VmService {
 
     }
     
-    
-    public void getStats(String vmName) throws RemoteException, InterruptedException {
-        
-    	//query database for the vmName entry overtime
-    	
+    public JSONObject getStats(String vmName) throws RemoteException, InterruptedException {
+        JSONObject json= new JSONObject();
+
+        String sql1 = "SELECT overall_cpu_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        List<String> cpu_usage = template.queryForList(sql1,String.class);
+        json.put("cpu_usage", cpu_usage);
+
+        String sql2 = "SELECT guest_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        List<String> guest_memory_usage = template.queryForList(sql2, String.class);
+        json.put("guest_memory_usage", guest_memory_usage);
+
+        String sql3 = "SELECT host_memory_usage FROM azvasa.stats WHERE vm_name ='" + vmName + "' LIMIT 10";
+        List<String> host_memory_usage = template.queryForList(sql3, String.class);
+        json.put("host_memory_usage", host_memory_usage);
+
+        return json;
     }
 
 }

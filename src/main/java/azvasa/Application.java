@@ -14,9 +14,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.vmware.vim25.mo.ServiceInstance;
-
+@EnableScheduling
 @SpringBootApplication()
 @ComponentScan(basePackages = {"azvasa"})
 @PropertySource(value = {"classpath:/properties/vm.properties","classpath:/properties/db.properties"},ignoreResourceNotFound = false)
