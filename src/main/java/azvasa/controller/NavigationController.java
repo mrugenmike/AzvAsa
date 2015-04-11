@@ -12,6 +12,11 @@ import azvasa.model.User;
 
 @Controller
 public class NavigationController {
+
+    @RequestMapping("/signup")
+    public String fetchSignUpPage(){
+        return "signup";
+    }
     @RequestMapping("/")
     public String mainPage() {
     	return "index";
@@ -26,7 +31,7 @@ public class NavigationController {
     }
     @RequestMapping(value ="/dashboard", method=RequestMethod.POST)
 	public String checkLoggedInUser(@ModelAttribute User user, Model model, HttpServletRequest req) {
-    	if(user.getName().equals("admin") && user.getPassword().equals("password")) {
+    	if(user.getUserName().equals("admin") && user.getPassword().equals("password")) {
     		return "dashboard";
     	}
     	else return "error";
