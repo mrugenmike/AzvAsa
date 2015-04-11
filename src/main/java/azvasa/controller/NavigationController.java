@@ -60,6 +60,7 @@ public class NavigationController {
     	User user = userService.find(creds.getUserName(),creds.getPassword());
         if(user!=null){
             response.addCookie(new Cookie("username",user.getUserName()));
+            model.addAttribute("username",user.getUserName());
             return getDashBoard(model,req,response);
         }
         model.addAttribute("error","No Profile found with given credentials");
@@ -72,6 +73,9 @@ public class NavigationController {
         if(cookies!=null)
         for(Cookie cookie:cookies){
             if(cookie.getName().equals("username")){
+                if(!model.containsAttribute("username")){
+                    model.addAttribute("username",cookie.getName());
+                }
                 return "dashboard";
             }
         }
