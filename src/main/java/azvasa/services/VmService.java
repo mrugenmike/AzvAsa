@@ -50,7 +50,7 @@ public class VmService {
 
             task.waitForTask();
 
-            System.out.println("vm:" + vm.getName() + " powered off.");
+            System.out.println("vm:" + vm.getName() + " powered on.");
         }
     }
     public void powerOffVM(String vmName) throws RemoteException, InterruptedException {

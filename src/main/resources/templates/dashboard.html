@@ -177,6 +177,7 @@
 		                scrollable: true,
 		                sortable: true,
 		                filterable: true,
+//			                dataBinding: onDataBinding,
 		                pageable: {
 		                    input: true,
 		                    numeric: false
@@ -187,8 +188,10 @@
 		                    { field: "name", title: "Name", width: "130px" },
 		                    { field: "guestOSName", title: "OS", width: "130px" },
 		                    { field: "ip", title: "IP", width: "130px" },
-		                    { field: "powerState", title: "Message", width: "130px", template: "#= showColorText(data) #" }
-		                ]
+		                    { field: "powerState", title: "Message", width: "130px", template: "#= showColorText(data) #" },
+                            { command: { text: "PowerOn", click: startVM}, title: " ", width: "180px"},		                    
+                            { command: { text: "PowerOff", click: stopVM}, title: " ", width: "180px"}		                    
+		                    ]
 		            });
 		        	
 		        }
@@ -271,6 +274,43 @@
                             }
                         });
 			        }
+			        function startVM(e) {
+			        	var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			        	console.log(dataItem.name);
+			        	var vmName = dataItem.name;
+			        	$.ajax({
+			        		type: "POST",
+                            url: "/api/v1/vms/"+vmName+"/on",
+                            success: function (response) {
+                                // Get default value from the server response
+                                console.log(response);
+                            },
+                            error: function () {
+                                // Stop displaying loading indicator
+                                kendo.ui.progress(editEvent.container, false);
+                                console.error("uh oh!");
+                            }
+                        });
+			        }
+			        
+			        function stopVM(e) {
+			        	var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			        	console.log(dataItem.name);
+			        	var vmName = dataItem.name;
+			        	$.ajax({
+			        		type: "POST",
+                            url: "/api/v1/vms/"+vmName+"/off",
+                            success: function (response) {
+                                // Get default value from the server response
+                                console.log(response);
+                            },
+                            error: function () {
+                                // Stop displaying loading indicator
+                                kendo.ui.progress(editEvent.container, false);
+                                console.error("uh oh!");
+                            }
+                        });
+			        }
 
 			        
 			        function createGauge(hostMemoryUsage, name) {
@@ -334,11 +374,11 @@
 	                            ]
 	                        }
 	                    });
-	                }			        
+	                }	
 			        function showColorText(data) {
-					if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
-					if(data.powerState=='poweredOff') return '<span style="color:red;">Stopped</span>';	
-				}
+						if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
+						if(data.powerState=='poweredOff') return '<span style="color:red;">Stopped</span>';	
+					}
 		        </script>            
 		    </div>
 	   </div>
