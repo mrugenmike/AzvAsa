@@ -5,11 +5,13 @@ import java.net.URL;
 import java.rmi.RemoteException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import com.vmware.vim25.mo.ServiceInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -43,19 +45,23 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
+    @Bean @Lazy()
     public ServiceInstance getServiceInstance() throws MalformedURLException, RemoteException {
         return new ServiceInstance(new URL(vcenterUrl),vcenterUsername,password,true);
     }
 
     @Bean
-    JdbcTemplate JdbcDB() {
+    BasicDataSource getDataSource(){
         final BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setUrl(dataSourceUrl);
         basicDataSource.setUsername(dbUserName);
         basicDataSource.setPassword(dbPassword);
-        return new JdbcTemplate(basicDataSource);
+        return basicDataSource;
     }
 
+    @Bean
+    JdbcTemplate JdbcDB() {
+        return new JdbcTemplate(getDataSource());
+    }
 
 }

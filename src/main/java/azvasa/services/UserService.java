@@ -17,4 +17,8 @@ public class UserService {
         user.setId(Integer.valueOf(time.substring(time.length()-6,time.length())));
         userRepository.save(user);
     }
+
+    public User find(String username,String password) {
+        return userRepository.findByUsername(username);
+    }
 }

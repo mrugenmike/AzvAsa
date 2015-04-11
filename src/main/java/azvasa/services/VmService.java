@@ -8,6 +8,7 @@ import com.vmware.vim25.VirtualMachineRuntimeInfo;
 import com.vmware.vim25.mo.*;
 import com.vmware.vim25.mo.VirtualMachine;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.rmi.RemoteException;
@@ -23,6 +24,13 @@ public class VmService {
 
     @Autowired
     ServiceInstance serviceInstance;
+
+    @Value("${linux.template}")
+    String linuxTemplate;
+
+    @Value("${windows.template}")
+    String windowsTemplate;
+
 
     public List<VMachine> getAllVirtualMachines() throws RemoteException {
         Folder rootFolder = serviceInstance.getRootFolder();
@@ -67,7 +75,7 @@ public class VmService {
     }
 
     public void deployVM(String type, String vmName) throws Exception{
-        String templateName = type.equals("linux")?"VM-Template-32bit-Ubu":"VM-Template-windows";
+        String templateName = type.equals("linux")?linuxTemplate:windowsTemplate;
         //String templateName = "VM-CLI-01";
         System.out.println("Deploying VM with Template: "+templateName);
         Folder rootFolder = serviceInstance.getRootFolder();
