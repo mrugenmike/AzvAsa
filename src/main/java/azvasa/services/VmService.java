@@ -126,7 +126,7 @@ public class VmService {
                 vmName, cloneSpec);
         System.out.println("Launching the VM clone task. " +
                 "Please wait ...");
-        String status = task.waitForTask();
+        String status = task.waitForMe();
         if(status==Task.SUCCESS){
             System.out.println("VM got cloned successfully.");
             vmRepository.storeVMEntry(new VMEntry(userName,vmName,new Date()));
