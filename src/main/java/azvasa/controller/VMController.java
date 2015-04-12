@@ -74,14 +74,10 @@ public class VMController {
     public ResponseEntity<String> createVm(@PathVariable("vm-type") String vmType,@PathVariable String userName) throws RemoteException, InterruptedException {
         final String timeStamp = new Long(new Date().getTime()).toString();
         String vmName = String.format("%s_%s_%s", vmType, userName, timeStamp.substring(timeStamp.length()-4,timeStamp.length()));
-        try {
             //vmType: linx , windows
-            vmService.deployVM(vmType,vmName,userName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        vmService.deployVM(vmType,vmName,userName);
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = {"/getStats/{vmName}"}, method = RequestMethod.GET)

@@ -3,12 +3,11 @@ package azvasa.services;
 import azvasa.model.VMEntry;
 import azvasa.model.VMachine;
 import azvasa.repository.VMRepository;
-import com.vmware.vim25.VirtualMachineCloneSpec;
-import com.vmware.vim25.VirtualMachinePowerState;
-import com.vmware.vim25.VirtualMachineRelocateSpec;
-import com.vmware.vim25.VirtualMachineRuntimeInfo;
+import com.vmware.vim25.*;
 import com.vmware.vim25.mo.*;
 import com.vmware.vim25.mo.VirtualMachine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +25,8 @@ import static azvasa.model.VMachine.instance;
 
 @Component
 public class VmService {
+
+    Logger logger = LoggerFactory.getLogger("VMService");
 
     @Autowired
     JdbcTemplate template;
@@ -91,7 +92,7 @@ public class VmService {
         }
     }
 
-    public void deployVM(String type, String vmName, String userName) throws Exception{
+    public void deployVM(String type, String vmName, String userName) throws VMDeploymentException, RemoteException {
         String templateName = type.equals("linux")?linuxTemplate:windowsTemplate;
         System.out.println("Deploying VM with Template: "+templateName);
         Folder rootFolder = serviceInstance.getRootFolder();
@@ -126,14 +127,19 @@ public class VmService {
                 vmName, cloneSpec);
         System.out.println("Launching the VM clone task. " +
                 "Please wait ...");
-        String status = task.waitForMe();
-        if(status==Task.SUCCESS){
-            System.out.println("VM got cloned successfully.");
-            vmRepository.storeVMEntry(new VMEntry(userName,vmName,new Date()));
+        try{
+            String status = task.waitForMe();
+            if(status==Task.SUCCESS){
+                logger.info("VM with name {} cloned successfully for user {}",vmName,userName);
+                vmRepository.storeVMEntry(new VMEntry(userName,vmName,new Date()));
+            }
+            else {
+                logger.error("VM with name {} failed to be deployed", vmName);
+            }
+        }catch(Exception ex){
+            throw new VMDeploymentException(ex.getMessage());
         }
-        else {
-            System.out.println("Failure -: VM cannot be cloned");
-        }
+
 
     }
     
