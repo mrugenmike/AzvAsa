@@ -188,7 +188,8 @@
 		                    { field: "ip", title: "IP", width: "130px" },
 		                    { field: "powerState", title: "Message", width: "130px", template: "#= showColorText(data) #" },
                             { command: { text: "PowerOn", click: startVM}, title: " ", width: "180px"},		                    
-                            { command: { text: "PowerOff", click: stopVM}, title: " ", width: "180px"}		                    
+                            { command: { text: "PowerOff", click: stopVM}, title: " ", width: "180px"},		                    
+                            { command: { text: "Connect", click: connectToVM}, title: "SSH / RDP", width: "180px"}		                    
 		                    ]
 		            });
 		        }
@@ -203,8 +204,8 @@
 	                createOSGauge(data.overallCPUUsage, data.name);
 	                
 	                $.ajax({
-//		                url: "/api/v1/getStats/"+data.name,
-		                url: "/api/v1/getLatestStats/"+data.name,
+		                url: "/api/v1/getStats/"+data.name,
+//		                url: "/api/v1/getLatestStats/"+data.name,
 			                success: function (response) {
 		                    // Get default value from the server response
 		                	var stats=response;
@@ -384,16 +385,24 @@
 	                    });
 	                }	
 			        function createGraphHistory(stats, vmName) {
+			        	var xaxis = ['0','5','10','15','20','25','30','35','40','45','50','55','60'];
 			        	$('#graphContainer'+vmName).highcharts({
 			        		 chart: {
-			        	            type: 'spline'
+			        	            type: 'spline',
+			        	            inverted: false
 			        	        },
 			        	        title: {
 			                    text: '',
 			                    x: -20 //center
 			                },
 			                xAxis: {
-			                    categories: ['50','45','40','35','30','25','20','15','10','5','0']
+			                	labels: {
+			                        formatter: function() {
+			                            return xaxis[this.value];
+			                        }
+			                    },
+			                    startOnTick: false,
+			                    endOnTick: false
 			                },
 			                yAxis: {
 			                    title: {
@@ -413,17 +422,28 @@
 //			                },
 			                series: [{
 			                    name: 'Host Memory',
-			                    data: stats.host_memory_usage
+			                    data: stats.host_memory_usage.reverse()
 			                }
 			                , {
 			                    name: 'CPU Usage',
-			                    data: stats.cpu_usage
+			                    data: stats.cpu_usage.reverse()
 			                }, {
 			                    name: 'Guest Memory',
-			                    data: stats.guest_memory_usage
+			                    data: stats.guest_memory_usage.reverse()
 			                }
 			                ]
 			            });
+			        }
+			        function connectToVM(e) {
+			        	var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			        	var guestOS = dataItem.guestOSName;
+			        	var ip = dataItem.ip;
+						if(guestOS.indexOf("Linux")>-1) {
+							alert("SSH Connect: ssh test@"+ip+"\n password is 123");
+						} else {
+							alert("Windows!");
+						}
+						
 			        }
 			        function showColorText(data) {
 						if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
