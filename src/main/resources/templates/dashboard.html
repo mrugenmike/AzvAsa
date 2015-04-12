@@ -203,8 +203,9 @@
 	                createOSGauge(data.overallCPUUsage, data.name);
 	                
 	                $.ajax({
-		                url: "/api/v1/getStats/"+data.name,
-		                success: function (response) {
+//		                url: "/api/v1/getStats/"+data.name,
+		                url: "/api/v1/getLatestStats/"+data.name,
+			                success: function (response) {
 		                    // Get default value from the server response
 		                	var stats=response;
 		                    console.log(stats);
@@ -388,12 +389,11 @@
 			        	            type: 'spline'
 			        	        },
 			        	        title: {
-			                    text: 'Memory Usage',
+			                    text: '',
 			                    x: -20 //center
 			                },
 			                xAxis: {
-			                    categories: ['5', '10', '15', '20', '25', '30',
-			                        '35', '40', '45', '50']
+			                    categories: ['50','45','40','35','30','25','20','15','10','5','0']
 			                },
 			                yAxis: {
 			                    title: {
@@ -416,7 +416,7 @@
 			                    data: stats.host_memory_usage
 			                }
 			                , {
-			                    name: 'CPU Memory',
+			                    name: 'CPU Usage',
 			                    data: stats.cpu_usage
 			                }, {
 			                    name: 'Guest Memory',
