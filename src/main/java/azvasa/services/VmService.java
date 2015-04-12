@@ -174,6 +174,8 @@ public class VmService {
     public JSONObject getLatestStats(String vmName) throws RemoteException, InterruptedException {
         JSONObject json = new JSONObject();
 
+        System.out.println(vmName);
+
         VirtualMachine vm = (VirtualMachine) new InventoryNavigator(serviceInstance.getRootFolder()).searchManagedEntity(
                 "VirtualMachine", vmName);
 
@@ -186,6 +188,7 @@ public class VmService {
         for (PerfMetricId id : pmis) {
             id.setInstance("");
         }
+
         Calendar curTime = serviceInstance.currentTime();
 
         PerfQuerySpec qSpec = new PerfQuerySpec();
@@ -212,7 +215,6 @@ public class VmService {
             printPerfMetric((PerfEntityMetric) pv.getEntity());
             PerfEntityMetricBase[] pembs = pv.getChildEntity();
             for (int i = 0; pembs != null && i < pembs.length; i++) {
-
                 printPerfMetric((PerfEntityMetric) pembs[i]);
             }
         }
