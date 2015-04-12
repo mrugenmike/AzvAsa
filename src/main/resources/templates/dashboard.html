@@ -110,17 +110,17 @@
 		        		"os":"Windows",
 		        		"os":"Linux"
 		        };
-		        
+		        var username = [[${username}]];
 		        
 
 				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
-		        	var username = [[${username}]];
+		        	
 		        	getDetails();
 //		        	var auto_refresh = setInterval(getDetails, 50000);
 		        	function getDetails() {
 		        		$.ajax({
-			                url: "/api/v1/vms"+username,
+			                url: "/api/v1/vms/"+username,
 			                success: function (response) {
 			                    // Get default value from the server response
 			                	vmObj=response;
@@ -226,7 +226,6 @@
 	        	}
 		        	
 			        function createTemplateGrid(templates) {
-				    	console.log(templates);
 			        	$("#templateGrid").kendoGrid({
 			                dataSource: {
 			                    data: templates,
@@ -256,14 +255,15 @@
 		        	}
 			        function createWindowsVM() {
                             $.ajax({
-                            url: "/api/v1/vms/create/windows"+username,
+                            url: "/api/v1/vms/create/windows/"+username,
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
                                 createGrid(vmObj);
+                                alert('VM Created');
                             },
                             error: function () {
-                                // Stop displaying loading indicator
+                            	alert('error creating VM');
                                 kendo.ui.progress(editEvent.container, false);
                                 console.error("uh oh!");
                             }
@@ -271,13 +271,15 @@
 			        }
 			        function createLinuxVM() {
                             $.ajax({
-                            url: "/api/v1/vms/create/linux"+username,
+                            url: "/api/v1/vms/create/linux/"+username,
                             success: function (response) {
                                 // Get default value from the server response
                                 vmObj=response;
                                 createGrid(vmObj);
+                                alert('VM Created');
                             },
                             error: function () {
+                            	alert('error creating VM');
                                 // Stop displaying loading indicator
                                 kendo.ui.progress(editEvent.container, false);
                                 console.error("uh oh!");
