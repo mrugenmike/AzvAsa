@@ -23,3 +23,11 @@ host_memory_usage VARCHAR(200) NOT NULL,
 PRIMARY KEY(id)
 );
 
+// create table vm_inventory per user.
+CREATE TABLE `azvasa`.`vm_inventory` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `vm_name` VARCHAR(45) NOT NULL,
+  `user_name` VARCHAR(45) NOT NULL,
+  `time_stamp` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `vm_name_UNIQUE` (`vm_name` ASC));
