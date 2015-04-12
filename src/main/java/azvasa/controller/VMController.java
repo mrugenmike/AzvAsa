@@ -87,4 +87,12 @@ public class VMController {
             return vmService.getStats(vmName);
     }
 
+
+    @RequestMapping(value = {"/getLatestStats/{vmName}"}, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public JSONObject GetVMLatestStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {
+        return vmService.getLatestStats(vmName);
+    }
+
 }
