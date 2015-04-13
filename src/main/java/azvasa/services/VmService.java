@@ -116,7 +116,7 @@ public class VmService {
             System.out.println("No template " + templateName + " found");
             return;
         } else {
-            System.out.println("NAME: " + vm.getName());
+            System.out.println("Template Name: " + vm.getName());
         }
         //DC and Resouce pool config
         VirtualMachineRelocateSpec locationSpec = new VirtualMachineRelocateSpec();
