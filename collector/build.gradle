@@ -14,6 +14,9 @@ apply plugin: 'idea'
 jar {
     baseName = 'collector'
     version =  '1.0'
+    manifest {
+        attributes 'Main-Class': 'com.azvasa.CollectorMain'
+    }
 }
 
 repositories {
