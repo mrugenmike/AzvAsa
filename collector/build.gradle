@@ -10,23 +10,27 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-
+//apply plugin:'application'
+apply plugin: 'java-library-distribution'
 jar {
     baseName = 'collector'
     version =  '1.0'
     manifest {
-        attributes 'Main-Class': 'com.azvasa.CollectorMain'
+        attributes 'Main-Class': 'com.azvasa.CollectorMain',
+                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+
     }
 }
-
+distZip.shouldRunAfter(build)
 repositories {
     mavenCentral()
+    flatDir { dirs 'lib' }
 }
 
 dependencies {
     compile fileTree(dir: 'lib', include: '*.jar',exclude:'jsp-api.jar,servlet-api.jar,commons-logging-1.1.1.jar')
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
-}
+//task wrapper(type: Wrapper) {
+//    gradleVersion = '1.11'
+//}
