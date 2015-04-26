@@ -1,29 +1,16 @@
 package com.azvasa;
+import com.vmware.vim25.*;
+import com.vmware.vim25.mo.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimerTask;
-
-import com.vmware.vim25.PerfCounterInfo;
-import com.vmware.vim25.PerfEntityMetricBase;
-import com.vmware.vim25.PerfEntityMetricCSV;
-import com.vmware.vim25.PerfMetricId;
-import com.vmware.vim25.PerfMetricSeriesCSV;
-import com.vmware.vim25.PerfProviderSummary;
-import com.vmware.vim25.PerfQuerySpec;
-import com.vmware.vim25.mo.HostSystem;
-import com.vmware.vim25.mo.InventoryNavigator;
-import com.vmware.vim25.mo.ManagedEntity;
-import com.vmware.vim25.mo.PerformanceManager;
-import com.vmware.vim25.mo.ServiceInstance;
-import com.vmware.vim25.mo.VirtualMachine;
 
 public class Collector extends TimerTask{
 
@@ -34,9 +21,7 @@ public class Collector extends TimerTask{
 	static HashMap<String, Integer> countersIdMap;
 	static PerfMetricId[] pmis;
 	static String HOSTNAME = null;
-	static String vCenterIP = "https://130.65.132.109/sdk";
-	static final String USER = "administrator";
-	static final String PW = "12!@qwQW";
+
 	static String VMNAME;
 	static boolean isHost = false;
 	static StringBuilder fullStat = new StringBuilder("");
@@ -56,8 +41,7 @@ public class Collector extends TimerTask{
 
 		ManagedEntity me;
 		try {
-			SERVICE_INSTANCE = new ServiceInstance(new URL(vCenterIP), USER,
-					PW, true);
+			SERVICE_INSTANCE = ServiceInstanceSingleton.getServiceInstance();
 
 
 			perfMgr = SERVICE_INSTANCE.getPerformanceManager();

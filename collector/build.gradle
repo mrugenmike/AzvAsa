@@ -1,36 +1,21 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE")
-    }
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-//apply plugin:'application'
-apply plugin: 'java-library-distribution'
-jar {
-    baseName = 'collector'
-    version =  '1.0'
-    manifest {
-        attributes 'Main-Class': 'com.azvasa.CollectorMain',
-                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
 
+
+task fatJar(type: Jar) {
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Main-Class': 'com.azvasa.CollectorMain'
     }
+    baseName = 'collector'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } with jar
 }
-distZip.shouldRunAfter(build)
 repositories {
     mavenCentral()
-    flatDir { dirs 'lib' }
 }
 
 dependencies {
     compile fileTree(dir: 'lib', include: '*.jar',exclude:'jsp-api.jar,servlet-api.jar,commons-logging-1.1.1.jar')
 }
-
-//task wrapper(type: Wrapper) {
-//    gradleVersion = '1.11'
-//}
