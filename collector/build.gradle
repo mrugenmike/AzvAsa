@@ -17,5 +17,5 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'lib', include: '*.jar',exclude:'jsp-api.jar,servlet-api.jar,commons-logging-1.1.1.jar')
+    compile fileTree(dir: 'lib')
 }
