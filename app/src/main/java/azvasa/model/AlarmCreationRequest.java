@@ -1,4 +1,4 @@
-package azvasa.controller.model;
+package azvasa.model;
 
 import com.vmware.vim25.*;
 import com.vmware.vim25.mo.VirtualMachine;
@@ -32,25 +32,12 @@ public class AlarmCreationRequest {
 
     public void setDescription(String description)
     {
-        if(metric.equalsIgnoreCase("cpu")) {
-            this.description = "CPU Alarm ";
-        }
-        else
-        {
-            this.description = "Memory Alarm ";
-        }
+       this.description = "Memory Alarm ";
     }
 
     public String getDescription()
     {
-        if(metric.equalsIgnoreCase("cpu")) {
-            this.description = "CPU Alarm ";
-        }
-        else
-        {
-            this.description = "Memory Alarm ";
-        }
-        return description;
+        return this.description;
     }
 
     public String getMetric() {

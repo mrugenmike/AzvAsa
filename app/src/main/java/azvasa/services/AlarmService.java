@@ -1,13 +1,16 @@
 package azvasa.services;
 
-import azvasa.controller.model.AlarmCreationRequest;
+import azvasa.model.AlarmCreationRequest;
 import com.vmware.vim25.*;
 import com.vmware.vim25.mo.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import java.util.List;
 import java.rmi.RemoteException;
+import azvasa.model.AlarmModel;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 
 @Component
 public class AlarmService {
@@ -28,7 +31,7 @@ public class AlarmService {
         logger.info("created Alarm for VM {}",vmname);
 
         //insert alarm details into database
-        String stats = String.format("insert into alarm( username , vm_name, alarmName , description ) " +
+        String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
                 " VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription());
         template.execute(stats);
     }
@@ -51,9 +54,9 @@ public class AlarmService {
 
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT * FROM alarm WHERE username ='"
+        String alarms = "SELECT * FROM azvasa.alarm WHERE username ='"
                 + username + "' vm_name  = '" + vmname +"'" ;
-        List alarmsList = jdbcTemplate.queryForList(alarms);
+        List alarmsList = template.queryForList(alarms);
         return alarmsList;
     }
 

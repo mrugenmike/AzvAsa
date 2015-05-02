@@ -1,6 +1,6 @@
 package azvasa.controller;
 
-import azvasa.controller.model.AlarmCreationRequest;
+import azvasa.model.AlarmCreationRequest;
 import azvasa.services.AlarmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import azvasa.model.AlarmModel;
 
 @RequestMapping("/api/v1")
 @RestController

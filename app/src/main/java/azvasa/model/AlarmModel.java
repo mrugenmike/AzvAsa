@@ -1,4 +1,4 @@
-package azvasa.controller;
+package azvasa.model;
 
 public class AlarmModel{
     private String username;
