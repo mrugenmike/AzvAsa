@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet"
+          th:href="@{/css/kendo.common.min.css}"
+          href="../css/kendo.common.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{/css/kendo.bootstrap.min.css}"
+          href="../css/kendo.bootstrap.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{/css/kendo.dataviz.min.css}"
+          href="../css/kendo.dataviz.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{/css/kendo.dataviz.default.min.css}"
+          href="../css/kendo.dataviz.default.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{http://fonts.googleapis.com/css?family=Open+Sans:300,400,700}"
+          href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"/>
+    <link rel="stylesheet" media="screen"
+          th:href="@{/assets/css/font-awesome.min.css}"
+          href="../assets/css/font-awesome.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{/assets/css/bootstrap.min.css}"
+          href="../assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" media="screen"
+          th:href="@{/assets/css/bootstrap-theme.css}"
+          href="../assets/css/bootstrap-theme.css"/>
+    <link rel="stylesheet" media="screen"
+          th:href="@{/assets/css/main.css}"
+          href="../assets/css/main.css"/>
+</head>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/kendo.all.min.js"></script>
+<script src="assets/js/headroom.min.js"></script>
+<script src="assets/js/jQuery.headroom.min.js"></script>
+<script src="assets/js/template.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+
+<script th:inline="javascript" type="text/x-kendo-template" id="alarmTemplate">
+    <div class="tabstrip">
+        <ul>
+            <li>
+                Stats
+            </li>
+        </ul>
+        <div class='vmDet'>
+        </div>
+    </div>
+</script>
+
+<body>
+<div id="alarmCrt">
+    <input id="alarmVmName" type="hidden"/>
+    <label>Send notification to </label>
+    <input id="emailAlarm" />
+    <br />
+    <br />
+    <label>Whenever: Average of </label>
+    <input id="alarmParam" />
+    <br />
+    <br />
+    <input id="alarmCond" />
+    <input id="alarmVal" />
+    <br />
+    <br />
+    <label>Name: </label>
+    <input id="alarmName" />
+    <br />
+    <br />
+    <label>Description: </label>
+    <input id="alarmDesc" />
+    <span>
+        <button id="createAlarm" class="k-primary">Create</button>
+    </span>
+</div>
+
+<div class="navbar navbar-inverse navbar-fixed-top headroom" >
+    <div class="container">
+        <div class="navbar-header">
+            <!-- Button for smallest screens -->
+            <a class="navbar-brand" href="/"><img src="assets/images/logo.png" alt="Pronet" width="150 px" height="50 px"></img></a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a class="btn" href="/signout">Sign out</a></li>
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a class="btn" href="/dashboard">Dashboard</a></li>
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                <li class="active"><a class="btn" href="/alarms">Alarms</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+<div id="alarmDashboard" style="margin-top:7%;">
+    <div id="alarmGrid"></div>
+
+</div>
+<script th:inline="javascript">
+    var dummy ={'name':'harshank',
+        'vmName':'VMDummy'};
+    $(document).ready(function() {
+
+        var auto_ref=setInterval(function() {window.location.reload();}, 60000);
+
+        var username = [[${username}]];
+
+        var data = [
+            {text: "CPU Usage", value:"CPU"},
+            {text: "Memory Usage", value:"Memory"}
+        ];
+        var cond= [
+            {text: "Greater than", value:"GreaterThan"},
+            {text: "Less than", value:"LessThan"}
+        ];
+        $("#emailAlarm").kendoMaskedTextBox({
+            mask: ""
+        });
+        $("#alarmVal").kendoMaskedTextBox({
+            mask: ""
+        });
+        $("#alarmName").kendoMaskedTextBox({
+            mask: ""
+        });
+        $("#alarmDesc").kendoMaskedTextBox({
+            mask: ""
+        });
+        $("#alarmParam").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource: data,
+            height: 100
+        })
+                .closest(".k-widget")
+                .attr("id", "products_wrapper");
+        var dropdownlist = $("#alarmParam").data("kendoDropDownList");
+
+        $("#alarmCond").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource: cond,
+            height: 100
+        })
+                .closest(".k-widget")
+                .attr("id", "products_wrapper");
+        var dropdownlist = $("#alarmCond").data("kendoDropDownList");
+        $("#createAlarm")
+                        .bind("click", function() {
+                    console.log($("#alarmVmName").val()+' '+username);
+            $.ajax({
+            url: "/api/v1/alarms/"+$("#alarmVmName").val()+"/"+username,
+            success: function (response) {
+                // Get default value from the server response
+                var stats=response;
+                console.log(stats);
+                createGraphHistory(stats, data.name);
+            },
+            error: function () {
+                // Stop displaying loading indicator
+                kendo.ui.progress(editEvent.container, false);
+                console.error("uh oh!");
+            }
+        });
+
+
+                });
+        var alarmWin= $("#alarmCrt");
+        if (!alarmWin.data("kendoWindow")) {
+            alarmWin.kendoWindow({
+                pinned: true,
+                position: { top: 100 },
+                width: "800px",
+//                height: "800px",
+                title: "Create VM",
+                actions: [
+                    "Pin",
+                    "Minimize",
+                    "Maximize",
+                    "Close"
+                ],
+                visible:false
+            });
+        }
+
+
+        $("#createAlarm").kendoButton();
+        var vmNames="";
+        getVmDetails();
+        function getVmDetails() {
+            var currentdate = new Date();
+            console.log(currentdate.getSeconds());
+            $.ajax({
+                url: "/api/v1/vms/"+username,
+                success: function (response) {
+                    // Get default value from the server response
+                    vmNames=response;
+                    createAlarmGrid(vmNames);
+                },
+                error: function () {
+                    // Stop displaying loading indicator
+                    kendo.ui.progress(editEvent.container, false);
+                    console.error("uh oh!");
+                }
+            });
+
+        }
+    });
+
+    function createAlarmGrid(vm) {
+        console.log(vm);
+        $("#alarmGrid").kendoGrid({
+            dataSource: {
+                data: vm,
+                schema: {
+                    model: {
+                        fields: {
+                            name: { type: "string" },
+                            ip: { type: "string" }
+                        }
+                    }
+                },
+                pageSize: 20
+            },
+            height: 550,
+            scrollable: true,
+            sortable: true,
+            filterable: true,
+//			                dataBinding: onDataBinding,
+            pageable: {
+                input: true,
+                numeric: false
+            },
+            detailTemplate: kendo.template($("#alarmTemplate").html()),
+            detailExpand: detailShow,
+            detailInit: function(e) {
+                // without this line, detail template bindings will not work
+                kendo.bind(e.detailRow, e.data);
+            },
+            columns: [
+                { field: "name", title: "Name", width: "130px" },
+                { field: "ip", title: "IP", width: "130px" },
+                { command: { text: "Create Alarm", click: createVM}, title: "Create VM", width: "180px"}
+            ]
+        });
+    }
+    function detailShow(e) {
+        console.log('rowindex '+e.detailRow[0].rowIndex);
+        var grid = $("#alarmGrid").data("kendoGrid");
+        var rowId = e.detailRow[0].rowIndex
+        var data = grid.dataItem("tr:eq("+rowId+")");
+        var detailRow = e.detailRow;
+
+//        $.ajax({
+//            url: "/api/v1/getStats/"+data.name,
+////		                url: "/api/v1/getLatestStats/"+data.name,
+//            success: function (response) {
+//                // Get default value from the server response
+//                var stats=response;
+//                console.log(stats);
+//                createGraphHistory(stats, data.name);
+//            },
+//            error: function () {
+//                // Stop displaying loading indicator
+//                kendo.ui.progress(editEvent.container, false);
+//                console.error("uh oh!");
+//            }
+//        });
+
+
+        detailRow.find(".tabstrip").kendoTabStrip({
+            animation: {
+                open: { effects: "fadeIn" }
+            }
+        });
+    }
+
+    function createVM(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vmName = dataItem.name;
+        $("#alarmVmName").val(vmName);
+        var alarmWin= $("#alarmCrt");
+        alarmWin.data("kendoWindow").open();
+    }
+
+</script>
+    </body>
+</html>

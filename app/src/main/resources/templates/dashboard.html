@@ -51,6 +51,12 @@
 				<ul class="nav navbar-nav pull-right">
 					<li class="active"><a class="btn" href="/signout">Sign out</a></li>
 				</ul>
+				<ul class="nav navbar-nav pull-right">
+					<li class="active"><a class="btn" href="/dashboard">Dashboard</a></li>
+				</ul>
+				<ul class="nav navbar-nav pull-right">
+					<li class="active"><a class="btn" href="/alarms">Alarms</a></li>
+				</ul>
 			</div><!--/.nav-collapse -->
 		</div>
 	</div> 
@@ -62,7 +68,7 @@
 		<div>
 			<button id="createVmButton" class="k-primary">Create VM</button>
 		</div>
-		
+
 		<div id="example">
 			<div id="popupVM">
 				<div id="templateGrid"></div>			
@@ -115,7 +121,7 @@
 
 				$(document).ready(function() { 
 		        	$("#createVmButton").kendoButton();
-		        	
+
 		        	getDetails();
 //		        	var auto_refresh = setInterval(getDetails, 50000);
 		        	function getDetails() {
