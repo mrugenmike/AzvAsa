@@ -21,13 +21,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class collectStatistics {
+
 	@Autowired
 	JdbcTemplate template;
 
 	 @Autowired
 	 ServiceInstance serviceInstance;
 
-	@Scheduled(fixedRate = 300000)
+	//@Scheduled(fixedRate = 300000)
 	public void work() throws Exception {
 		try
 		{
