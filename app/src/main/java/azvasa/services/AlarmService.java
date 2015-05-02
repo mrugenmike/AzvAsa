@@ -3,7 +3,6 @@ package azvasa.services;
 import azvasa.controller.model.AlarmCreationRequest;
 import com.vmware.vim25.*;
 import com.vmware.vim25.mo.*;
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
