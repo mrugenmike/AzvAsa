@@ -124,7 +124,7 @@
     var vms=[];
     $(document).ready(function() {
         $("#createAlarmButton").kendoButton();
-        var auto_ref=setInterval(function() {getAllAlarms();}, 60000);
+        var auto_ref=setInterval(function() {$("#alarmGrid").data("kendoGrid").destroy();getAllAlarms();}, 60000);
 
         var data = [
             {text: "CPU Usage", value:"cpu"},
@@ -263,7 +263,8 @@
             success: function (response) {
                 // Get default value from the server response
                 console.log(response);
-                    createAlarmGrid(response);
+                createAlarmGrid(response);
+//                collapseRows();
             },
             error: function () {
                 // Stop displaying loading indicator
@@ -297,6 +298,9 @@
                 input: true,
                 numeric: false
             },
+            dataBound: function() {
+                this.collapseRow(this.tbody.find("tr.k-master-row"));
+            },
             detailTemplate: kendo.template($("#alarmTemplate").html()),
             detailExpand: detailShow,
             detailInit: function(e) {
@@ -307,7 +311,8 @@
                 { field: "vm_name", title: "VM Name", width: "130px" },
                 { field: "alarmName", title: "Alarm Name", width: "130px" },
                 { field: "status", title: "Status", width: "130px",template: "#= colorAlarmStatus(data) #" },
-                { command: { text: "Delete Alarm", click: deleteAlarm}, title: " ", width: "180px"}
+                { command: { text: "Delete Alarm", click: deleteAlarm}, title: " ", width: "180px"},
+                { command: { text: "Ack Alarm", click: ackAlarm}, title: " ", width: "180px"}
             ]
         });
     }
@@ -319,7 +324,7 @@
         var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
         $.ajax({
             type: "DELETE",
-            url: "/api/v1/alarms/"+dataItem.alarmName+"/"+username+"/off",
+            url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/off",
             success: function (response) {
                 // Get default value from the server response
                 console.log(response);
@@ -333,6 +338,25 @@
                 alert('Error deleting alarm');
             }
         });
+    }
+    function ackAlarm(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+//        $.ajax({
+//            type: "PUT",
+//            url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/off",
+//            success: function (response) {
+//                // Get default value from the server response
+//                console.log(response);
+//                alert('Alarm Deleted');
+//                getAllAlarms();
+//            },
+//            error: function () {
+//                // Stop displaying loading indicator
+//                kendo.ui.progress(editEvent.container, false);
+//                console.error("uh oh!");
+//                alert('Error deleting alarm');
+//            }
+//        });
     }
     function detailShow(e) {
         var grid = $("#alarmGrid").data("kendoGrid");
@@ -445,5 +469,5 @@
     }
 
 </script>
-    </body>
+</body>
 </html>
