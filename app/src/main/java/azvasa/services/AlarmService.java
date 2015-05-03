@@ -23,12 +23,14 @@ public class AlarmService {
     ServiceInstance serviceInstance;
 
     public void createAlarm(String userName , String vmname, String alarmname, AlarmCreationRequest alarmCreationRequest) throws RemoteException {
+
+
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
         final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
         final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
-        logger.info("created Alarm for VM {}",vmname);
+        logger.info("created Alarm for VM {}", vmname);
 
         //insert alarm details into database
         String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
@@ -54,14 +56,25 @@ public class AlarmService {
 
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT * FROM azvasa.alarm WHERE username ='"
-                + username + "' vm_name  = '" + vmname +"'" ;
+        String alarms = "SELECT username , vm_name, alarmName , description FROM azvasa.alarm WHERE " +
+                "username ='" + username + "' and  vm_name  = '" + vmname + "'" ;
         List alarmsList = template.queryForList(alarms);
+
+        final AlarmManager alarmManager = serviceInstance.getAlarmManager();
+        InventoryNavigator inv = new InventoryNavigator(si.getRootFolder());
+        VirtualMachine vm = (VirtualMachine) inv.searchManagedEntity("VirtualMachine", vmname);
+        Alarm[] alarms = alarmMgr.getAlarm(vm);
+        if (alarms != null) {
+            for (int k = 0; k < alarms.length; k++) {
+                Alarm a = alarms[k];
+                a.getAlarmInfo().
+            }
+        }
+
         return alarmsList;
     }
 
     public void sendEmailNotification() {
 
     }
-
 }

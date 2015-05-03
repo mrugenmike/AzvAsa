@@ -65,7 +65,7 @@ public class VMController {
         final String timeStamp = new Long(new Date().getTime()).toString();
         String vmName = String.format("%s_%s_%s", vmType, userName, timeStamp.substring(timeStamp.length()-4,timeStamp.length()));
             //vmType: linx , windows
-        vmService.deployVM(vmType,vmName,userName);
+        vmService.deployVM(vmType, vmName, userName);
 
         return new ResponseEntity<String>(HttpStatus.CREATED);
     }
@@ -84,5 +84,4 @@ public class VMController {
     public JSONObject GetVMLatestStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {
         return vmService.getLatestStats(vmName);
     }
-
 }

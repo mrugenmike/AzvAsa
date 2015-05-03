@@ -5,12 +5,9 @@ import com.vmware.vim25.mo.VirtualMachine;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class AlarmCreationRequest {
-
     private AlarmExpression expression;
-
     @NotEmpty
     private String operator; // values: >,<
-
     @NotEmpty
     private String description;
 
@@ -32,7 +29,7 @@ public class AlarmCreationRequest {
 
     public void setDescription(String description)
     {
-       this.description = "Memory Alarm ";
+       this.description = description ;
     }
 
     public String getDescription()
@@ -47,23 +44,18 @@ public class AlarmCreationRequest {
     public void setMetric(String metric) {
         this.metric = metric;
     }
-
     public int getRedValue() {
         return redValue;
     }
-
     public void setRedValue(int redValue) {
         this.redValue = redValue;
     }
-
     public int getYellowValue() {
         return yellowValue;
     }
-
     public void setYellowValue(int yellowValue) {
         this.yellowValue = yellowValue;
     }
-
     public AlarmExpression getExpression()
     {
         return getAlarmExpression();
