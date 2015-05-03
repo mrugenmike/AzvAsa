@@ -26,25 +26,37 @@ public class AlarmService {
 
     public void createAlarm(String userName , String vmname, String alarmname, AlarmCreationRequest alarmCreationRequest) throws RemoteException {
         //validation to check if the alarm with the same metric has been set
-        String alarms = "SELECT count(1) FROM azvasa.alarm WHERE username = '"+ userName +"' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'" ;
-        Integer alarmCount = (Integer)template.queryForObject(alarms, Integer.class);
+
+        final AlarmManager alarmManager = serviceInstance.getAlarmManager();
+        final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
+        final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
+
+        String al = "SELECT count(1) FROM azvasa.alarm WHERE username = '"+ userName +"' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'" ;
+        Integer alarmCount = (Integer)template.queryForObject(al, Integer.class);
 
         if(alarmCount > 0)
         {
             System.out.println("Alarm already set for .. so deleting !!");
             String del = "DELETE FROM azvasa.alarm WHERE username = '" + userName + "' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'";
             template.execute(del);
+
+            Alarm[] alarms = alarmManager.getAlarm(vm);
+            if (alarms != null) {
+                for (int k = 0; k < alarms.length; k++) {
+                    Alarm a = alarms[k];
+                    if(a.getAlarmInfo().getName().equalsIgnoreCase(alarmname))
+                        a.removeAlarm();
+                }
+            }
+
         }
 
-        final AlarmManager alarmManager = serviceInstance.getAlarmManager();
-        final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
-        final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
 
         String stats = String.format("insert into azvasa.alarm" +
-                "( username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
-                " VALUES('%s','%s','%s','%s','%s','%s','%s','Running')", userName ,vmname , alarmname, alarmCreationRequest.getDescription(), alarmCreationRequest.getMetric() , alarmCreationRequest.getOperator() , alarmCreationRequest.getRedValue()  + alarmCreationRequest.getEmail());
+                "(username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
+                " VALUES('%s','%s','%s','%s','%s','%s','%s','%s','Running')", userName ,vmname , alarmname, alarmCreationRequest.getDescription(), alarmCreationRequest.getMetric() , alarmCreationRequest.getOperator() , alarmCreationRequest.getRedValue(), alarmCreationRequest.getEmail());
 
         template.execute(stats);
     }

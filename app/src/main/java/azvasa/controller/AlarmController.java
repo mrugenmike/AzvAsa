@@ -27,7 +27,8 @@ public class AlarmController {
         {
             alarmService.createAlarm(username,vmname,alarmname,alarmCreationRequest);
         }
-        catch(RemoteException e) {
+        catch(RemoteException e)
+        {
             e.printStackTrace();
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
