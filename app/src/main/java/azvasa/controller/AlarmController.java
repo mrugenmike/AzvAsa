@@ -44,6 +44,15 @@ public class AlarmController {
         //return isDeleted;
     }
 
+    @RequestMapping(value = "/alarms/{vmname}/{alarmName}/{username}/ack",method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody
+    void ackAlarm(@PathVariable String alarmName, @PathVariable String username, @PathVariable String vmname) throws Exception
+    {
+        alarmService.ackAlarm(alarmName, username , vmname);
+        //return isDeleted;
+    }
+
     @RequestMapping(value = "/alarms/{username}",method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
