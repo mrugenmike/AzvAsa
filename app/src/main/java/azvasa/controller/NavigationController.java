@@ -41,6 +41,20 @@ public class NavigationController {
     	return "login";
     }
 
+    @RequestMapping("/alarms")
+    public String showAlarms(Model model,HttpServletRequest request) {
+
+        final Cookie[] cookies = request.getCookies();
+        if(cookies!=null)
+            for(Cookie cookie:cookies) {
+                if (cookie.getName().equals("username")) {
+                    if (!model.containsAttribute("username")) {
+                        model.addAttribute("username", cookie.getValue());
+                    }
+                }
+            }
+        return "alarms";
+    }
     @RequestMapping("/signout")
     public void logout(HttpServletRequest req,HttpServletResponse response) throws IOException {
         final List<Cookie> cookies = Arrays.asList(req.getCookies());
@@ -72,7 +86,7 @@ public class NavigationController {
         for(Cookie cookie:cookies){
             if(cookie.getName().equals("username")){
                 if(!model.containsAttribute("username")){
-                    model.addAttribute("username",cookie.getName());
+                    model.addAttribute("username",cookie.getValue());
                 }
                 return "dashboard";
             }

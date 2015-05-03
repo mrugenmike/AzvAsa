@@ -41,3 +41,4 @@ vm_name VARCHAR(200) NOT NULL,
 alarmName VARCHAR(200) NOT NULL,
 description VARCHAR(200) NOT NULL
 );
+alter table alarm add status varchar(100) default 'Running';

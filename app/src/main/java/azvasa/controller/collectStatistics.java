@@ -28,7 +28,7 @@ public class collectStatistics {
 	 @Autowired
 	 ServiceInstance serviceInstance;
 
-	//@Scheduled(fixedRate = 300000)
+	@Scheduled(fixedRate = 1000)
 	public void work() throws Exception {
 		try
 		{
@@ -39,18 +39,16 @@ public class collectStatistics {
 				VirtualMachine vm = (VirtualMachine) VMs[i];
 				String vmName = vm.getName();
 				VirtualMachineQuickStats stas = vm.getSummary().getQuickStats();
-				
-				System.out.println("----------Statistic of " + vm.getName()+ " ----------------");
-				System.out.println("Guest Memory usage: " + stas.guestMemoryUsage);
-				System.out.println("Host Memory usage: " + stas.hostMemoryUsage);
-				System.out.println("Overall CPU usage: " + stas.overallCpuUsage);
-
+//				System.out.println("----------Statistic of " + vm.getName()+ " ----------------");
+//				System.out.println("Guest Memory usage: " + stas.guestMemoryUsage);
+//				System.out.println("Host Memory usage: " + stas.hostMemoryUsage);
+//				System.out.println("Overall CPU usage: " + stas.overallCpuUsage);
 				//insert into Database
 				String stats = String.format("insert into stats(vm_name,overall_cpu_usage,guest_memory_usage,host_memory_usage) VALUES('%s','%s','%s','%s')",vm.getName(),stas.overallCpuUsage,stas.guestMemoryUsage,stas.hostMemoryUsage);
 				template.execute(stats);
 			}
 		}
-		catch (Exception e) {
+		catch(Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

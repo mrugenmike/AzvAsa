@@ -5,6 +5,12 @@ public class AlarmModel{
     private String vmname ;
     private String alarmname;
     private String description;
+    private String alarmMetric;
+    private String alarmOperator;
+    private String alarmThresholdValue;
+    private String email;
+
+    public AlarmModel(){}
 
     public String getUsername() {
         return username;
@@ -36,5 +42,37 @@ public class AlarmModel{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAlarmMetric() {
+        return alarmMetric;
+    }
+
+    public void setAlarmMetric(String alarmMetric) {
+        this.alarmMetric = alarmMetric;
+    }
+
+    public String getAlarmOperator() {
+        return alarmOperator;
+    }
+
+    public void setAlarmOperator(String alarmOperator) {
+        this.alarmOperator = alarmOperator;
+    }
+
+    public String getAlarmThresholdValue() {
+        return alarmThresholdValue;
+    }
+
+    public void setAlarmThresholdValue(String alarmThresholdValue) {
+        this.alarmThresholdValue = alarmThresholdValue;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

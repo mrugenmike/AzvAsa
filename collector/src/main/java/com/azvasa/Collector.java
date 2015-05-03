@@ -37,13 +37,10 @@ public class Collector extends TimerTask{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stubVMNAME = args[0];
-		
-
 		ManagedEntity me;
+
 		try {
 			SERVICE_INSTANCE = ServiceInstanceSingleton.getServiceInstance();
-
-
 			perfMgr = SERVICE_INSTANCE.getPerformanceManager();
 			PerfCounterInfo[] pcis = perfMgr.getPerfCounter();
 
@@ -53,8 +50,6 @@ public class Collector extends TimerTask{
 			countersinfoMap = new HashMap<Integer, PerfCounterInfo>();
 
 			for (int i = 0; i < pcis.length; i++) {
-
-
 				countersinfoMap.put(pcis[i].getKey(), pcis[i]);
 				countersIdMap.put(
 						pcis[i].getGroupInfo().getKey() + "."
@@ -123,7 +118,9 @@ public class Collector extends TimerTask{
 
 	static void writeStatToFile(ManagedEntity me, boolean isHost,
 			String filename1) throws Exception {
+
 		PerfProviderSummary pps = perfMgr.queryPerfProviderSummary(me);
+
 		int refreshRate = pps.getRefreshRate().intValue();
 
 		// only return the latest one sample
@@ -131,6 +128,7 @@ public class Collector extends TimerTask{
 
 		PerfEntityMetricBase[] pValues = perfMgr
 				.queryPerf(new PerfQuerySpec[] { qSpec });
+
 		if (pValues != null) {
 			for (int i = 0; i < pValues.length; ++i) {
 				storePerfMetricCSV((PerfEntityMetricCSV) pValues[i], me,isHost,
@@ -141,8 +139,6 @@ public class Collector extends TimerTask{
 
 	static String storePerfMetricCSV(PerfEntityMetricCSV pem, ManagedEntity me,boolean isHost,
 			String filename1) {
-
-
 
 		StringBuilder oneLine = new StringBuilder("");
 		if(isHost)
@@ -157,7 +153,8 @@ public class Collector extends TimerTask{
 		for (int i = 0; i < csvs.length; i++) {
 			statReturn.put(csvs[i].getId().getCounterId(), csvs[i]);
 		}
-		for (int i = 0; i < counters.length; i++) {
+		for (int i = 0; i < counters.length; i++)
+		{
 			Integer counterId = countersIdMap.get(counters[i]);
 			String value = null;
 			if (statReturn.containsKey(counterId))
@@ -167,11 +164,13 @@ public class Collector extends TimerTask{
 			}
 			System.out.print(value + ",");
 			oneLine.append(value);
-
 			oneLine.append(" ");
-
 		}
+
 		System.out.print(oneLine.toString());
+
+		//insert into sql here
+
 		try {
 			if (!file.exists()) {
 				PrintWriter writer = new PrintWriter(new BufferedWriter(
@@ -203,7 +202,4 @@ public class Collector extends TimerTask{
 		qSpec.setIntervalId(new Integer(interval));
 		return qSpec;
 	}
-
-	
-
 }

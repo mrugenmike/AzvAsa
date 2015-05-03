@@ -22,19 +22,24 @@ public class AlarmService {
     @Autowired
     ServiceInstance serviceInstance;
 
+    EmailService email = new EmailService();
+
     public void createAlarm(String userName , String vmname, String alarmname, AlarmCreationRequest alarmCreationRequest) throws RemoteException {
-
-
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
         final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
         final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
-        logger.info("created Alarm for VM {}", vmname);
+        System.out.println(alarmCreationRequest.getEmail());
 
-        //insert alarm details into database
-        String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
-                " VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription());
+        //insert all alarm details into database
+        //String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
+                //" VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription() );
+
+        String stats = String.format("insert into azvasa.alarm" +
+                "( username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
+                " VALUES('%s','%s','%s','%s','%s','%s','%s','Running')", userName ,vmname , alarmname, alarmCreationRequest.getDescription(), alarmCreationRequest.getMetric() , alarmCreationRequest.getOperator() , alarmCreationRequest.getRedValue()  + alarmCreationRequest.getEmail());
+
         template.execute(stats);
     }
 
@@ -54,12 +59,42 @@ public class AlarmService {
         return spec;
     }
 
+    public Integer deleteAlarm(String alarmName, String username , String vmname)  throws Exception
+    {
+        //delete alarm ?? remove from DB
+        String alarms = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"'";
+        Integer res = template.update(alarms);
+
+        final AlarmManager alarmManager = serviceInstance.getAlarmManager();
+        InventoryNavigator inv = new InventoryNavigator(si.getRootFolder());
+        VirtualMachine vm = (VirtualMachine) inv.searchManagedEntity("VirtualMachine", vmname);
+        Alarm[] alarms = alarmMgr.getAlarm(vm);
+        if (alarms != null) {
+            for (int k = 0; k < alarms.length; k++) {
+                Alarm a = alarms[k];
+                if(a.getAlarmInfo().getName().equalsIgnoreCase(alarmName))
+                    a.removeAlarm();
+            }
+        }
+
+        return res;
+    }
+
+    public List getAlarms(String username)  throws Exception
+    {
+        String alarms = "SELECT username, vm_name, alarmName, description, status FROM azvasa.alarm WHERE username ='"
+                + username + "' and status = 'Running'";
+        List alarmsList = template.queryForList(alarms);
+        return alarmsList;
+    }
+
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT username , vm_name, alarmName , description FROM azvasa.alarm WHERE " +
-                "username ='" + username + "' and  vm_name  = '" + vmname + "'" ;
+        String alarms = "SELECT username, vm_name, alarmName, description FROM azvasa.alarm WHERE username ='"
+                + username + "' and vm_name  = '" + vmname +"'" +" and status = 'Running'" ;
         List alarmsList = template.queryForList(alarms);
 
+        /*get Status of every alarm
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
         InventoryNavigator inv = new InventoryNavigator(si.getRootFolder());
         VirtualMachine vm = (VirtualMachine) inv.searchManagedEntity("VirtualMachine", vmname);
@@ -69,12 +104,9 @@ public class AlarmService {
                 Alarm a = alarms[k];
                 a.getAlarmInfo().
             }
-        }
+        }*/
 
         return alarmsList;
     }
 
-    public void sendEmailNotification() {
-
-    }
 }
