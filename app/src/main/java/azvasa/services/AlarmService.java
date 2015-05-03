@@ -25,16 +25,22 @@ public class AlarmService {
     EmailService email = new EmailService();
 
     public void createAlarm(String userName , String vmname, String alarmname, AlarmCreationRequest alarmCreationRequest) throws RemoteException {
+        //validation to check if the alarm with the same metric has been set
+        String alarms = "SELECT count(1) FROM azvasa.alarm WHERE username = '"+ userName +"' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'" ;
+        Integer alarmCount = (Integer)template.queryForObject(alarms, Integer.class);
+
+        if(alarmCount > 0)
+        {
+            System.out.println("Alarm already set for .. so deleting !!");
+            String del = "DELETE FROM azvasa.alarm WHERE username = '" + userName + "' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'";
+            template.execute(del);
+        }
+
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
         final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
         final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
-        System.out.println(alarmCreationRequest.getEmail());
-
-        //insert all alarm details into database
-        //String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
-                //" VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription() );
 
         String stats = String.format("insert into azvasa.alarm" +
                 "( username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
@@ -59,16 +65,18 @@ public class AlarmService {
         return spec;
     }
 
-    public Integer deleteAlarm(String alarmName, String username , String vmname)  throws Exception
+    public void deleteAlarm(String alarmName, String username , String vmname)  throws Exception
     {
         //delete alarm ?? remove from DB
-        String alarms = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"'";
-        Integer res = template.update(alarms);
+        //String alarms = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"'";
+
+        String del = "DELETE FROM azvasa.alarm WHERE username = '" + username + "' and vm_name  = '" + vmname +"' and alarmName = '"+  alarmName + "'";
+        template.execute(del);
 
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
-        InventoryNavigator inv = new InventoryNavigator(si.getRootFolder());
+        InventoryNavigator inv = new InventoryNavigator(serviceInstance.getRootFolder());
         VirtualMachine vm = (VirtualMachine) inv.searchManagedEntity("VirtualMachine", vmname);
-        Alarm[] alarms = alarmMgr.getAlarm(vm);
+        Alarm[] alarms = alarmManager.getAlarm(vm);
         if (alarms != null) {
             for (int k = 0; k < alarms.length; k++) {
                 Alarm a = alarms[k];
@@ -77,7 +85,7 @@ public class AlarmService {
             }
         }
 
-        return res;
+        //return res;
     }
 
     public List getAlarms(String username)  throws Exception
@@ -108,5 +116,4 @@ public class AlarmService {
 
         return alarmsList;
     }
-
 }

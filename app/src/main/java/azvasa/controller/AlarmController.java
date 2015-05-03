@@ -16,6 +16,7 @@ import azvasa.model.AlarmModel;
 public class AlarmController {
 
     private static final AtomicInteger count = new AtomicInteger(0);
+
     @Autowired
     private AlarmService alarmService;
 
@@ -36,10 +37,10 @@ public class AlarmController {
     @RequestMapping(value = "/alarms/{vmname}/{alarmName}/{username}/off",method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
-    Integer deleteAlarm(@PathVariable String alarmName, @PathVariable String username, @PathVariable String vmname) throws Exception
+    void deleteAlarm(@PathVariable String alarmName, @PathVariable String username, @PathVariable String vmname) throws Exception
     {
-        Integer isDeleted = alarmService.deleteAlarm(alarmName, username , vmname);
-        return isDeleted;
+        alarmService.deleteAlarm(alarmName, username , vmname);
+        //return isDeleted;
     }
 
     @RequestMapping(value = "/alarms/{username}",method = RequestMethod.GET)
@@ -61,11 +62,13 @@ public class AlarmController {
         return alarms;
     }
 
-    @RequestMapping(value = "/alarms/monitor/{username}",method = RequestMethod.GET)
+/*    @RequestMapping(value = "/alarms/monitor/{username}",method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
     void monitorAlarm(@PathVariable String username) throws Exception
     {
         monitorUserAlarm(username);
     }
+*/
+
 }

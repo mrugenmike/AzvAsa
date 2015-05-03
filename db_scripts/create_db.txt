@@ -33,12 +33,18 @@ CREATE TABLE `azvasa`.`vm_inventory` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `vm_name_UNIQUE` (`vm_name` ASC));
 
-// create azvasa.alarm
 create table azvasa.alarm
 (
 username VARCHAR(200) NOT NULL,
 vm_name VARCHAR(200) NOT NULL,
 alarmName VARCHAR(200) NOT NULL,
-description VARCHAR(200) NOT NULL
+description VARCHAR(200) NOT NULL,
+alarmMetric VARCHAR(200) NOT NULL,
+alarmOperator VARCHAR(200) NOT NULL,
+alarmThresholdValue VARCHAR(200) NOT NULL,
+email VARCHAR(200) NOT NULL,
+status VARCHAR(200) NOT NULL
 );
-alter table alarm add status varchar(100) default 'Running';
+
+#alter table alarm add status varchar(100) default 'Running';
+#username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
