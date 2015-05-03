@@ -48,14 +48,27 @@
                 Stats
             </li>
         </ul>
-        <div class='vmDet'>
+        <div>
+            <div class="alarmInfo">
+            <ul style="list-style:none;font-style:italic;margin: 15px;padding: 0;">
+                <li style = "margin: 0;line-height: 1.7em;">
+                    <div id="graphAlarmContainer#= alarmName #" style="width:90%;"></div>
+                </li>
+            </ul>
+            </div>
         </div>
     </div>
 </script>
 
 <body>
 <div id="alarmCrt">
+    <form id="myForm" action="#">
     <input id="alarmVmName" type="hidden"/>
+
+    <label>VM: </label>
+    <input id="alarmForVmNames" />
+    <br />
+    <br />
     <label>Send notification to </label>
     <input id="emailAlarm" />
     <br />
@@ -76,7 +89,7 @@
     <input id="alarmDesc" />
     <span>
         <button id="createAlarm" class="k-primary">Create</button>
-    </span>
+    </span></form>
 </div>
 
 <div class="navbar navbar-inverse navbar-fixed-top headroom" >
@@ -98,27 +111,34 @@
         </div><!--/.nav-collapse -->
     </div>
 </div>
-<div id="alarmDashboard" style="margin-top:7%;">
+<div style="margin-top:7%;">
+    <button id="createAlarmButton" class="k-primary">Create Alarm</button>
+</div>
+
+<div id="alarmDashboard" >
     <div id="alarmGrid"></div>
 
 </div>
 <script th:inline="javascript">
-    var dummy ={'name':'harshank',
-        'vmName':'VMDummy'};
+    var username = [[${username}]];
+    var vms=[];
     $(document).ready(function() {
-
-        var auto_ref=setInterval(function() {window.location.reload();}, 60000);
-
-        var username = [[${username}]];
+        $("#createAlarmButton").kendoButton();
+        var auto_ref=setInterval(function() {getAllAlarms();}, 60000);
 
         var data = [
-            {text: "CPU Usage", value:"CPU"},
-            {text: "Memory Usage", value:"Memory"}
+            {text: "CPU Usage", value:"cpu"},
+            {text: "Memory Usage", value:"mmy"}
         ];
         var cond= [
-            {text: "Greater than", value:"GreaterThan"},
-            {text: "Less than", value:"LessThan"}
+            {text: "Greater than", value:"greaterThan"},
+            {text: "Less than", value:"lessThan"}
         ];
+        var bc= [
+            {text: "Greater than", value:"greaterThan"},
+            {text: "Less than", value:"lessThan"}
+        ];
+        console.log(cond);
         $("#emailAlarm").kendoMaskedTextBox({
             mask: ""
         });
@@ -139,34 +159,46 @@
         })
                 .closest(".k-widget")
                 .attr("id", "products_wrapper");
-        var dropdownlist = $("#alarmParam").data("kendoDropDownList");
+        $("#alarmParam").data("kendoDropDownList");
 
         $("#alarmCond").kendoDropDownList({
             dataTextField: "text",
             dataValueField: "value",
             dataSource: cond,
             height: 100
-        })
-                .closest(".k-widget")
-                .attr("id", "products_wrapper");
-        var dropdownlist = $("#alarmCond").data("kendoDropDownList");
+        });
+        $("#alarmCond").data("kendoDropDownList");
+
         $("#createAlarm")
                         .bind("click", function() {
-                    console.log($("#alarmVmName").val()+' '+username);
+                    console.log($("#alarmCond").val()+' '+$("#alarmParam").val()+' '+$("#alarmDesc").val()+' '+$("#alarmVal").val());
             $.ajax({
-            url: "/api/v1/alarms/"+$("#alarmVmName").val()+"/"+username,
-            success: function (response) {
-                // Get default value from the server response
-                var stats=response;
-                console.log(stats);
-                createGraphHistory(stats, data.name);
-            },
-            error: function () {
-                // Stop displaying loading indicator
-                kendo.ui.progress(editEvent.container, false);
-                console.error("uh oh!");
-            }
-        });
+                type:"POST",
+                url: "/api/v1/alarms/"+$("#alarmForVmNames").val()+'/'+$("#alarmName").val()+"/"+username,
+                data: JSON.stringify({
+                    "operator": $("#alarmCond").val(),
+                    "metric": $("#alarmParam").val(),
+                    "redValue":$("#alarmVal").val(),
+                    "email":$("#emailAlarm").val(),
+                    "description":$("#alarmDesc").val()
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    // Get default value from the server response
+                    var stats=response;
+                    console.log(stats);
+                    alert('Alarm Created');
+                    getVmDetails();
+//                    createGraphHistory(stats, data.name);
+                },
+                error: function () {
+                    // Stop displaying loading indicator
+                    kendo.ui.progress(editEvent.container, false);
+                    alert('AlarmCreation failed');
+                    console.error("uh oh!");
+                }
+            });
 
 
                 });
@@ -177,7 +209,7 @@
                 position: { top: 100 },
                 width: "800px",
 //                height: "800px",
-                title: "Create VM",
+                title: "Create Alarm",
                 actions: [
                     "Pin",
                     "Minimize",
@@ -187,20 +219,32 @@
                 visible:false
             });
         }
+        $("#createAlarmButton")
+                .bind("click", function() {
+                    alarmWin.data("kendoWindow").open();
+                });
+
 
 
         $("#createAlarm").kendoButton();
         var vmNames="";
         getVmDetails();
         function getVmDetails() {
-            var currentdate = new Date();
-            console.log(currentdate.getSeconds());
             $.ajax({
                 url: "/api/v1/vms/"+username,
                 success: function (response) {
                     // Get default value from the server response
-                    vmNames=response;
-                    createAlarmGrid(vmNames);
+                    for(var prop in response) {
+                        console.log(response[prop].name);
+                        vms.push({text:response[prop].name,value:response[prop].name});
+                    }
+                    $("#alarmForVmNames").kendoDropDownList({
+                        dataTextField: "text",
+                        dataValueField: "value",
+                        dataSource: vms,
+                        height: 100
+                    });
+                    getAllAlarms();
                 },
                 error: function () {
                     // Stop displaying loading indicator
@@ -211,7 +255,23 @@
 
         }
     });
-
+    function getAllAlarms() {
+        var currentdate = new Date();
+        console.log(currentdate.getSeconds());
+        $.ajax({
+            url: "/api/v1/alarms/"+username,
+            success: function (response) {
+                // Get default value from the server response
+                console.log(response);
+                    createAlarmGrid(response);
+            },
+            error: function () {
+                // Stop displaying loading indicator
+                kendo.ui.progress(editEvent.container, false);
+                console.error("uh oh!");
+            }
+        });
+    }
     function createAlarmGrid(vm) {
         console.log(vm);
         $("#alarmGrid").kendoGrid({
@@ -220,8 +280,9 @@
                 schema: {
                     model: {
                         fields: {
-                            name: { type: "string" },
-                            ip: { type: "string" }
+                            vm_name: { type: "string" },
+                            alarmName: { type: "string" },
+                            status: {type:"string"}
                         }
                     }
                 },
@@ -243,27 +304,65 @@
                 kendo.bind(e.detailRow, e.data);
             },
             columns: [
-                { field: "name", title: "Name", width: "130px" },
-                { field: "ip", title: "IP", width: "130px" },
-                { command: { text: "Create Alarm", click: createVM}, title: "Create VM", width: "180px"}
+                { field: "vm_name", title: "VM Name", width: "130px" },
+                { field: "alarmName", title: "Alarm Name", width: "130px" },
+                { field: "status", title: "Status", width: "130px",template: "#= colorAlarmStatus(data) #" },
+                { command: { text: "Delete Alarm", click: deleteAlarm}, title: " ", width: "180px"}
             ]
         });
     }
+    function colorAlarmStatus(data) {
+        if(data.status=='Running') return '<span style="color:green;">Running</span>';
+        if(data.status=='Off') return '<span style="color:red;">Stopped</span>';
+    }
+    function deleteAlarm(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $.ajax({
+            type: "DELETE",
+            url: "/api/v1/alarms/"+dataItem.alarmName+"/"+username+"/off",
+            success: function (response) {
+                // Get default value from the server response
+                console.log(response);
+                alert('Alarm Deleted');
+                getAllAlarms();
+            },
+            error: function () {
+                // Stop displaying loading indicator
+                kendo.ui.progress(editEvent.container, false);
+                console.error("uh oh!");
+                alert('Error deleting alarm');
+            }
+        });
+    }
     function detailShow(e) {
-        console.log('rowindex '+e.detailRow[0].rowIndex);
         var grid = $("#alarmGrid").data("kendoGrid");
         var rowId = e.detailRow[0].rowIndex
         var data = grid.dataItem("tr:eq("+rowId+")");
         var detailRow = e.detailRow;
-
-//        $.ajax({
-//            url: "/api/v1/getStats/"+data.name,
-////		                url: "/api/v1/getLatestStats/"+data.name,
-//            success: function (response) {
+//                $.ajax({
+//            url: "/api/v1/alarms/"+data.vm_name+"/"+username,
+//            success: function (res) {
 //                // Get default value from the server response
-//                var stats=response;
-//                console.log(stats);
-//                createGraphHistory(stats, data.name);
+//                detailRow.find(".alarmInfo").kendoGrid({
+//                    dataSource: {
+//                        data:res,
+//                        schema: {
+//                            model: {
+//                                fields: {
+//                                    alarmName: {type: "string"},
+//                                    description: {type: "string"}
+//                                }
+//                            }
+//                        }
+//                    },
+//                    scrollable: false,
+//                    sortable: true,
+//                    pageable: true,
+//                    columns: [
+//                        { field: "alarmName", title:"Alarm Name", width: "70px" },
+//                        { field: "description", title:"Description", width: "110px" }
+//                    ]
+//                });
 //            },
 //            error: function () {
 //                // Stop displaying loading indicator
@@ -273,19 +372,76 @@
 //        });
 
 
+
+        $.ajax({
+            url: "/api/v1/stats/"+data.vm_name,
+            success: function (response) {
+                // Get default value from the server response
+                console.log(response);
+                createAlarmGraph(response, data.alarmName);
+            },
+            error: function () {
+                // Stop displaying loading indicator
+                kendo.ui.progress(editEvent.container, false);
+                console.error("uh oh!");
+            }
+        });
+
         detailRow.find(".tabstrip").kendoTabStrip({
             animation: {
                 open: { effects: "fadeIn" }
             }
         });
     }
-
-    function createVM(e) {
-        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-        var vmName = dataItem.name;
-        $("#alarmVmName").val(vmName);
-        var alarmWin= $("#alarmCrt");
-        alarmWin.data("kendoWindow").open();
+    function createAlarmGraph(stats, alarmName) {
+        var xaxis = ['0','5','10','15','20','25','30','35','40','45','50','55','60'];
+        $('#graphAlarmContainer'+alarmName).highcharts({
+            chart: {
+                type: 'spline',
+                inverted: false
+            },
+            title: {
+                text: '',
+                x: -20 //center
+            },
+            xAxis: {
+                labels: {
+                    formatter: function() {
+                        return xaxis[this.value];
+                    }
+                },
+                startOnTick: false,
+                endOnTick: false
+            },
+            yAxis: {
+                title: {
+                    text: 'Units'
+                },
+                floor:100,
+                ceiling:1000
+            },
+            tooltip: {
+                valueSuffix: 'units'
+            },
+//			                legend: {
+//			                    layout: 'vertical',
+//			                    align: 'right',
+//			                    verticalAlign: 'middle',
+//			                    borderWidth: 0
+//			                },
+            series: [{
+                name: 'Host Memory',
+                data: stats.host_memory_usage.reverse()
+            }
+                , {
+                    name: 'CPU Usage',
+                    data: stats.cpu_usage.reverse()
+                }, {
+                    name: 'Guest Memory',
+                    data: stats.guest_memory_usage.reverse()
+                }
+            ]
+        });
     }
 
 </script>

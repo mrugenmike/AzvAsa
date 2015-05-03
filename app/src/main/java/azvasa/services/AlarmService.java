@@ -29,10 +29,10 @@ public class AlarmService {
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
         logger.info("created Alarm for VM {}",vmname);
-
+        System.out.println(alarmCreationRequest.getEmail());
         //insert alarm details into database
         String stats = String.format("insert into azvasa.alarm( username , vm_name, alarmName , description ) " +
-                " VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription());
+                " VALUES('%s','%s','%s','%s')", userName ,vmname , alarmname, alarmCreationRequest.getDescription() );
         template.execute(stats);
     }
 
@@ -52,10 +52,25 @@ public class AlarmService {
         return spec;
     }
 
+    public Integer deleteAlarm(String alarmName, String username)  throws Exception
+    {
+        String alarms = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"'";
+        Integer res = template.update(alarms);
+        return res;
+    }
+
+    public List getAlarms(String username)  throws Exception
+    {
+        String alarms = "SELECT username, vm_name, alarmName, description, status FROM azvasa.alarm WHERE username ='"
+                + username + "' and status = 'Running'";
+        List alarmsList = template.queryForList(alarms);
+        return alarmsList;
+    }
+
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT * FROM azvasa.alarm WHERE username ='"
-                + username + "' vm_name  = '" + vmname +"'" ;
+        String alarms = "SELECT username, vm_name, alarmName, description FROM azvasa.alarm WHERE username ='"
+                + username + "' and vm_name  = '" + vmname +"'" +" and status = 'Running'" ;
         List alarmsList = template.queryForList(alarms);
         return alarmsList;
     }

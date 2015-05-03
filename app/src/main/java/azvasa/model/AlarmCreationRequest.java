@@ -20,7 +20,16 @@ public class AlarmCreationRequest {
     @NotEmpty
     private int redValue;// specifies value to raise alarm
 
+    private String email;
     private int yellowValue; //specified value for yellow state
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getOperator() {
         return operator;
@@ -32,7 +41,7 @@ public class AlarmCreationRequest {
 
     public void setDescription(String description)
     {
-       this.description = "Memory Alarm ";
+       this.description = description;
     }
 
     public String getDescription()
@@ -72,7 +81,7 @@ public class AlarmCreationRequest {
     private AlarmExpression getAlarmExpression() {
         final MetricAlarmExpression exp = new MetricAlarmExpression();
 
-        if(operator.equals(">"))
+        if(operator.equals("greaterThan"))
         {
             exp.setOperator(MetricAlarmOperator.isAbove);
         }
@@ -105,15 +114,15 @@ public class AlarmCreationRequest {
     public AlarmAction getemailAction()
     {
         SendEmailAction action = new SendEmailAction();
-        action.setToList("varunac1990@gmail.com");
+        action.setToList(email);
         action.setCcList("varunac1990@gmail.com");
         action.setSubject("Alarm - {alarmName} on {targetName}\n");
-        action.setBody("Description:{eventDescription}\n"
-                + "TriggeringSummary:{triggeringSummary}\n"
-                + "newStatus:{newStatus}\n"
-                + "oldStatus:{oldStatus}\n"
-                + "target:{target}");
-
+//        action.setBody("Description:{eventDescription}\n"
+//                + "TriggeringSummary:{triggeringSummary}\n"
+//                + "newStatus:{newStatus}\n"
+//                + "oldStatus:{oldStatus}\n"
+//                + "target:{target}");
+        action.setBody("Hey");
         AlarmTriggeringAction alarmAction =   new AlarmTriggeringAction();
         alarmAction.setYellow2red(true);
         alarmAction.setAction(action);

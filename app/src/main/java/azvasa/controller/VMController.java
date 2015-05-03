@@ -70,7 +70,7 @@ public class VMController {
         return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = {"/getStats/{vmName}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/stats/{vmName}"}, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public JSONObject GetVMStats(@PathVariable("vmName") String vmName) throws RemoteException, InterruptedException {

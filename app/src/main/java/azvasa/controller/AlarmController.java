@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.concurrent.atomic.AtomicInteger;
 import java.rmi.RemoteException;
 import java.util.List;
 import azvasa.model.AlarmModel;
@@ -15,11 +15,13 @@ import azvasa.model.AlarmModel;
 @RestController
 public class AlarmController {
 
+    private static final AtomicInteger count = new AtomicInteger(0);
     @Autowired
     private AlarmService alarmService;
 
-    @RequestMapping(value = "alarms/{vmname}/{alarmname}/{username}",method = RequestMethod.POST)
+    @RequestMapping(value = "/alarms/{vmname}/{alarmname}/{username}",method = RequestMethod.POST)
     ResponseEntity<String> createAlarm(@RequestBody AlarmCreationRequest alarmCreationRequest,@PathVariable String vmname,@PathVariable String alarmname , @PathVariable String username){
+        if(vmname==null || vmname.equals("")) vmname = "Unnamed-"+count.incrementAndGet();
         try
         {
             alarmService.createAlarm(username,vmname,alarmname,alarmCreationRequest);
@@ -31,7 +33,26 @@ public class AlarmController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "alarms/{vmname}/{username}",method = RequestMethod.GET)
+    @RequestMapping(value = "/alarms/{alarmName}/{username}/off",method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody
+    Integer deleteAlarm(@PathVariable String alarmName, @PathVariable String username) throws Exception
+    {
+        Integer isDeleted = alarmService.deleteAlarm(alarmName, username);
+        return isDeleted;
+    }
+
+    @RequestMapping(value = "/alarms/{username}",method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody
+    List getAlarms(@PathVariable String username) throws Exception
+    {
+        List alarms = alarmService.getAlarms(username);
+        return alarms;
+    }
+
+
+    @RequestMapping(value = "/alarms/{vmname}/{username}",method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
     List getAlarms(@PathVariable String vmname , @PathVariable String username) throws Exception
@@ -40,7 +61,7 @@ public class AlarmController {
         return alarms;
     }
 
-    @RequestMapping(value = "sendAlarmNotification/",method = RequestMethod.GET)
+    @RequestMapping(value = "/sendAlarmNotification/",method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public void sendEmailNotification() throws Exception
     {
