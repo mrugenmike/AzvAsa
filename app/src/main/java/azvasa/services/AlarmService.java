@@ -57,8 +57,9 @@ public class AlarmService {
         String stats = String.format("insert into azvasa.alarm" +
                 "(username , vm_name, alarmName , description , alarmMetric , alarmOperator , alarmThresholdValue , email , status ) " +
                 " VALUES('%s','%s','%s','%s','%s','%s','%s','%s','Running')", userName ,vmname , alarmname, alarmCreationRequest.getDescription(), alarmCreationRequest.getMetric() , alarmCreationRequest.getOperator() , alarmCreationRequest.getRedValue(), alarmCreationRequest.getEmail());
-
         template.execute(stats);
+
+        System.out.println("Alarm created !!");
     }
 
     public AlarmSpec getAlarmSpec(AlarmCreationRequest alarmCreationRequest,String alarmName) {
@@ -96,36 +97,21 @@ public class AlarmService {
                     a.removeAlarm();
             }
         }
-
-        //return res;
     }
 
     public List getAlarms(String username)  throws Exception
     {
         String alarms = "SELECT username, vm_name, alarmName, description, status FROM azvasa.alarm WHERE username ='"
-                + username + "' and status = 'Running'";
+                + username + "' and status <> 'Off'";
         List alarmsList = template.queryForList(alarms);
         return alarmsList;
     }
 
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT username, vm_name, alarmName, description FROM azvasa.alarm WHERE username ='"
-                + username + "' and vm_name  = '" + vmname +"'" +" and status = 'Running'" ;
+        String alarms = "SELECT username, vm_name, alarmName, description , status FROM azvasa.alarm WHERE username ='"
+                + username + "' and vm_name  = '" + vmname +"'" +" and status <> 'Off'" ;
         List alarmsList = template.queryForList(alarms);
-
-        /*get Status of every alarm
-        final AlarmManager alarmManager = serviceInstance.getAlarmManager();
-        InventoryNavigator inv = new InventoryNavigator(si.getRootFolder());
-        VirtualMachine vm = (VirtualMachine) inv.searchManagedEntity("VirtualMachine", vmname);
-        Alarm[] alarms = alarmMgr.getAlarm(vm);
-        if (alarms != null) {
-            for (int k = 0; k < alarms.length; k++) {
-                Alarm a = alarms[k];
-                a.getAlarmInfo().
-            }
-        }*/
-
         return alarmsList;
     }
 }
