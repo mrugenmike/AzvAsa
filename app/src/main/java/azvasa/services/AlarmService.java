@@ -79,11 +79,10 @@ public class AlarmService {
 
     public void deleteAlarm(String alarmName, String username , String vmname)  throws Exception
     {
-        //delete alarm ?? remove from DB
-        //String alarms = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"'";
+        String query = "UPDATE alarm set status = 'Off' where username='"+username+"' and alarmName = '"+alarmName+"' and vm_name ='"+vmname+"'";
 
-        String del = "DELETE FROM azvasa.alarm WHERE username = '" + username + "' and vm_name  = '" + vmname +"' and alarmName = '"+  alarmName + "'";
-        template.execute(del);
+//        String del = "DELETE FROM azvasa.alarm WHERE username = '" + username + "' and vm_name  = '" + vmname +"' and alarmName = '"+  alarmName + "'";
+        template.update(query);
 
         final AlarmManager alarmManager = serviceInstance.getAlarmManager();
         InventoryNavigator inv = new InventoryNavigator(serviceInstance.getRootFolder());
@@ -99,11 +98,17 @@ public class AlarmService {
 
         //return res;
     }
+    public void ackAlarm(String alarmName, String username , String vmname)  throws Exception
+    {
+        String query = "UPDATE alarm set status = 'Running' where username='"+username+"' and alarmName = '"+alarmName+"' and vm_name ='"+vmname+"'";
+        template.update(query);
+
+    }
 
     public List getAlarms(String username)  throws Exception
     {
         String alarms = "SELECT username, vm_name, alarmName, description, status FROM azvasa.alarm WHERE username ='"
-                + username + "' and status = 'Running'";
+                + username + "' and status <> 'Off'";
         List alarmsList = template.queryForList(alarms);
         return alarmsList;
     }
@@ -111,7 +116,7 @@ public class AlarmService {
     public List getAlarms(String username, String vmname)  throws Exception
     {
         String alarms = "SELECT username, vm_name, alarmName, description FROM azvasa.alarm WHERE username ='"
-                + username + "' and vm_name  = '" + vmname +"'" +" and status = 'Running'" ;
+                + username + "' and vm_name  = '" + vmname +"'" +" and status <> 'Off'" ;
         List alarmsList = template.queryForList(alarms);
 
         /*get Status of every alarm

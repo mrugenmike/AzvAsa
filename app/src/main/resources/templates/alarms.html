@@ -319,6 +319,7 @@
     function colorAlarmStatus(data) {
         if(data.status=='Running') return '<span style="color:green;">Running</span>';
         if(data.status=='Off') return '<span style="color:red;">Stopped</span>';
+        if(data.status=='Triggered') return '<span style="color:gray;">Triggered</span>';
     }
     function deleteAlarm(e) {
         var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
@@ -341,22 +342,22 @@
     }
     function ackAlarm(e) {
         var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-//        $.ajax({
-//            type: "PUT",
-//            url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/off",
-//            success: function (response) {
-//                // Get default value from the server response
-//                console.log(response);
-//                alert('Alarm Deleted');
-//                getAllAlarms();
-//            },
-//            error: function () {
-//                // Stop displaying loading indicator
-//                kendo.ui.progress(editEvent.container, false);
-//                console.error("uh oh!");
-//                alert('Error deleting alarm');
-//            }
-//        });
+        $.ajax({
+            type: "PUT",
+            url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/ack",
+            success: function (response) {
+                // Get default value from the server response
+                console.log(response);
+                alert('Alarm Started');
+                getAllAlarms();
+            },
+            error: function () {
+                // Stop displaying loading indicator
+                kendo.ui.progress(editEvent.container, false);
+                console.error("uh oh!");
+                alert('Error starting alarm again');
+            }
+        });
     }
     function detailShow(e) {
         var grid = $("#alarmGrid").data("kendoGrid");
