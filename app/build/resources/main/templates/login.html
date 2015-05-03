@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Login</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet"
+		  th:href="@{http://fonts.googleapis.com/css?family=Open+Sans:300,400,700}"
+		  href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"/>
+		<link rel="stylesheet"
+		  th:href="@{/assets/css/bootstrap.min.css}"
+		  href="../assets/css/bootstrap.min.css"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/font-awesome.min.css}"
+		  href="../assets/css/font-awesome.min.css"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/bootstrap-theme.css}"
+		  href="../assets/css/bootstrap-theme.css"/>
+		<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/main.css}"
+		  href="../assets/css/main.css"/>
+		
+	</head>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script src="assets/js/headroom.min.js"></script>
+	<script src="assets/js/jQuery.headroom.min.js"></script>
+	<script src="assets/js/template.js"></script>
+	
+	<body>
+	
+	<div class="navbar navbar-inverse navbar-fixed-top headroom" >
+		<div class="container">
+			<div class="navbar-header">
+				<!-- Button for smallest screens -->
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"><span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+				<a class="navbar-brand" href="/"><img src="assets/images/logo.png" alt="Pronet" width="150 px" height="50 px"></img></a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav pull-right">
+					<li><a href="/">Home</a></li>
+					<li><a href="/about">About</a></li>
+					<li class="active"><a class="btn" href="/login">Sign in</a></li>
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+	</div> 
+	<!-- /.navbar -->
+
+	<header id="head" class="secondary"></header>
+
+	<!-- container -->
+	<div class="container">
+<!--
+		<ol class="breadcrumb">
+			<li><a href="/">Home</a></li>
+			<li class="active">Sign in</li>
+		</ol>
+-->
+		<div class="row">
+			
+			<!-- Article main content -->
+			<article class="col-xs-12 maincontent">
+				<header class="page-header">
+					<h1 class="page-title">Sign in</h1>
+				</header>
+				
+				<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<h3 class="thin text-center">Sign in to your account</h3>
+							<hr />
+
+							<div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+							<form method="post" action="#" th:action="@{/auth}">
+
+								<div class="top-margin">
+									<label>Username <span class="text-danger">*</span></label>
+									<input type="text" class="form-control" name="userName" />
+								</div>
+								<div class="top-margin">
+									<label>Password <span class="text-danger">*</span></label>
+									<input type="password" class="form-control" name="password" />
+								</div>
+
+								<hr />
+
+								<div class="row">
+									<div class="col-lg-8 text-left">
+										<button class="btn btn-action"><a href="/signup">Sign Up</a></button>
+									</div>
+									<div class="col-lg-4 text-right">
+										<button class="btn btn-action" type="submit">Sign in</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+
+				</div>
+				
+			</article>
+			<!-- /Article -->
+
+		</div>
+	</div>	<!-- /container -->
+	
+	</body>
+	</html>

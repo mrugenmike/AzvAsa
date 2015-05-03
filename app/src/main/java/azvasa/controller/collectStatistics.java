@@ -1,7 +1,6 @@
 package azvasa.controller;
 
 import java.util.ArrayList;
-
 import azvasa.repository.SignUpException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +10,7 @@ import com.vmware.vim25.mo.InventoryNavigator;
 import com.vmware.vim25.mo.ManagedEntity;
 import com.vmware.vim25.mo.ServiceInstance;
 import com.vmware.vim25.mo.VirtualMachine;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
@@ -21,13 +21,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class collectStatistics {
+
 	@Autowired
 	JdbcTemplate template;
 
 	 @Autowired
 	 ServiceInstance serviceInstance;
 
-	@Scheduled(fixedRate = 300000)
+	//@Scheduled(fixedRate = 300000)
 	public void work() throws Exception {
 		try
 		{

@@ -32,8 +32,8 @@ public class Collector extends TimerTask{
 	{
 		VMNAME=VmName;
 		FILENAME=filePath;
-		
 	}
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stubVMNAME = args[0];
@@ -193,8 +193,8 @@ public class Collector extends TimerTask{
 		return oneLine.toString();
 	}
 
-	private static PerfQuerySpec createPerfQuerySpec(ManagedEntity me,
-			int maxSample, int interval) {
+	private static PerfQuerySpec createPerfQuerySpec(ManagedEntity me, int maxSample, int interval)
+	{
 		PerfQuerySpec qSpec = new PerfQuerySpec();
 		qSpec.setEntity(me.getMOR());
 		qSpec.setMaxSample(new Integer(maxSample));
