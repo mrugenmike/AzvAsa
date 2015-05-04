@@ -31,25 +31,25 @@ public class AlarmService {
         final InventoryNavigator navigator = new InventoryNavigator(serviceInstance.getRootFolder());
         final ManagedEntity vm = navigator.searchManagedEntity("VirtualMachine", vmname);
 
-        String al = "SELECT count(1) FROM azvasa.alarm WHERE username = '"+ userName +"' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'" ;
-        Integer alarmCount = (Integer)template.queryForObject(al, Integer.class);
-
-        if(alarmCount > 0)
-        {
-            System.out.println("Alarm already set for .. so deleting !!");
-            String del = "DELETE FROM azvasa.alarm WHERE username = '" + userName + "' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'";
-            template.execute(del);
-
-            Alarm[] alarms = alarmManager.getAlarm(vm);
-            if (alarms != null) {
-                for (int k = 0; k < alarms.length; k++) {
-                    Alarm a = alarms[k];
-                    if(a.getAlarmInfo().getName().equalsIgnoreCase(alarmname))
-                        a.removeAlarm();
-                }
-            }
-
-        }
+//        String al = "SELECT count(1) FROM azvasa.alarm WHERE username = '"+ userName +"' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'" ;
+//        Integer alarmCount = (Integer)template.queryForObject(al, Integer.class);
+//
+//        if(alarmCount > 0)
+//        {
+//            System.out.println("Alarm already set for .. so deleting !!");
+//            String del = "DELETE FROM azvasa.alarm WHERE username = '" + userName + "' and vm_name  = '" + vmname +"' and alarmMetric = '"+  alarmCreationRequest.getMetric() + "'";
+//            template.execute(del);
+//
+//            Alarm[] alarms = alarmManager.getAlarm(vm);
+//            if (alarms != null) {
+//                for (int k = 0; k < alarms.length; k++) {
+//                    Alarm a = alarms[k];
+//                    if(a.getAlarmInfo().getName().equalsIgnoreCase(alarmname))
+//                        a.removeAlarm();
+//                }
+//            }
+//
+//        }
 
         AlarmSpec spec = getAlarmSpec(alarmCreationRequest, alarmname);
         final Alarm alarm = alarmManager.createAlarm(vm, spec);
@@ -106,7 +106,7 @@ public class AlarmService {
 
     public List getAlarms(String username)  throws Exception
     {
-        String alarms = "SELECT username, vm_name, alarmName, description, status FROM azvasa.alarm WHERE username ='"
+        String alarms = "SELECT username, vm_name, alarmName, description, status, email, alarmOperator, alarmThresholdValue FROM azvasa.alarm WHERE username ='"
                 + username + "' and status <> 'Off'";
         List alarmsList = template.queryForList(alarms);
         return alarmsList;
@@ -114,9 +114,14 @@ public class AlarmService {
 
     public List getAlarms(String username, String vmname)  throws Exception
     {
-        String alarms = "SELECT username, vm_name, alarmName, description , status FROM azvasa.alarm WHERE username ='"
+        String alarms = "SELECT username, vm_name, alarmName, description , status, email, alarmOperator, alarmThresholdValue FROM azvasa.alarm WHERE username ='"
                 + username + "' and vm_name  = '" + vmname +"'" +" and status <> 'Off'" ;
         List alarmsList = template.queryForList(alarms);
         return alarmsList;
+    }
+
+    public void updateTriggeringAlarm(String alarmName, String vmName) {
+        String query = "UPDATE alarm set status = 'Triggered' where alarmName = '"+alarmName+"' and vm_name ='"+vmName+"'";
+        template.update(query);
     }
 }

@@ -128,13 +128,14 @@
 
         var data = [
             {text: "CPU Usage", value:"cpu_usage_none"},
-            {text: "Memory Usage", value:"mem_usage_none"}
+            {text: "Memory Usage", value:"mem_usage_none"},
+            {text: "Disk Usage", value:"disk_usage_none"},
+            {text: "Network Usage", value:"net_usage_none"}
         ];
         var cond= [
             {text: "Greater than", value:"greaterThan"},
             {text: "Less than", value:"lessThan"}
         ];
-        console.log(cond);
         $("#emailAlarm").kendoMaskedTextBox({
             mask: ""
         });
@@ -167,7 +168,6 @@
 
         $("#createAlarm")
                         .bind("click", function() {
-                    console.log($("#alarmCond").val()+' '+$("#alarmParam").val()+' '+$("#alarmDesc").val()+' '+$("#alarmVal").val());
             $.ajax({
                 type:"POST",
                 url: "/api/v1/alarms/"+$("#alarmForVmNames").val()+'/'+$("#alarmName").val()+"/"+username,
@@ -183,7 +183,6 @@
                 success: function (response) {
                     // Get default value from the server response
                     var stats=response;
-                    console.log(stats);
                     alert('Alarm Created');
                     getVmDetails();
 //                    createGraphHistory(stats, data.name);
@@ -231,7 +230,6 @@
                 success: function (response) {
                     // Get default value from the server response
                     for(var prop in response) {
-                        console.log(response[prop].name);
                         vms.push({text:response[prop].name,value:response[prop].name});
                     }
                     $("#alarmForVmNames").kendoDropDownList({
@@ -258,7 +256,6 @@
             url: "/api/v1/alarms/"+username,
             success: function (response) {
                 // Get default value from the server response
-                console.log(response);
                 createAlarmGrid(response);
 //                collapseRows();
             },
@@ -270,7 +267,6 @@
         });
     }
     function createAlarmGrid(vm) {
-        console.log(vm);
         $("#alarmGrid").kendoGrid({
             dataSource: {
                 data: vm,
@@ -279,7 +275,11 @@
                         fields: {
                             vm_name: { type: "string" },
                             alarmName: { type: "string" },
-                            status: {type:"string"}
+                            status: {type:"string"},
+                            email: {type:"string"},
+                            description: {type:"string"},
+                            alarmOperator: {type:"string"},
+                            alarmThresholdValue: {type:"string"}
                         }
                     }
                 },
@@ -304,9 +304,13 @@
                 kendo.bind(e.detailRow, e.data);
             },
             columns: [
-                { field: "vm_name", title: "VM Name", width: "130px" },
+                { field: "vm_name", title: "VM Name", width: "90px" },
                 { field: "alarmName", title: "Alarm Name", width: "130px" },
-                { field: "status", title: "Status", width: "130px",template: "#= colorAlarmStatus(data) #" },
+                { field: "status", title: "Status", width: "90px",template: "#= colorAlarmStatus(data) #" },
+                { field: "email", title: "Email", width: "130px" },
+                { field: "alarmOperator", title: "Operator", width: "130px" },
+                { field: "alarmThresholdValue", title: "Threshold", width: "130px" },
+                { field: "description", title: "Description", width: "130px" },
                 { command: { text: "Delete Alarm", click: deleteAlarm}, title: " ", width: "180px"},
                 { command: { text: "Ack Alarm", click: ackAlarm}, title: " ", width: "180px"}
             ]
@@ -324,7 +328,6 @@
             url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/off",
             success: function (response) {
                 // Get default value from the server response
-                console.log(response);
                 alert('Alarm Deleted');
                 getAllAlarms();
             },
@@ -343,7 +346,6 @@
             url: "/api/v1/alarms/"+dataItem.vm_name+"/"+dataItem.alarmName+"/"+username+"/ack",
             success: function (response) {
                 // Get default value from the server response
-                console.log(response);
                 alert('Alarm Started');
                 getAllAlarms();
             },
@@ -365,7 +367,6 @@
             url: "/api/v1/stats/"+data.vm_name,
             success: function (response) {
                 // Get default value from the server response
-                console.log(response);
                 createAlarmGraph(response, data.alarmName);
             },
             error: function () {

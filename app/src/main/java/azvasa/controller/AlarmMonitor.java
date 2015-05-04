@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
 
+import azvasa.services.AlarmService;
 import azvasa.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,15 +27,18 @@ public class AlarmMonitor{
 	@Autowired
 	EmailService emailService;
 
+	@Autowired
+	AlarmService alarmService;
+
 	static Long lastExecutionTime ;
 	@Scheduled(fixedDelay = 10000)
 	public void monitorUserAlarm() throws Exception
 	{
 		lastExecutionTime = new Date().getTime();
-		String alarms = "SELECT username, vm_name, alarmName, description, alarmMetric , alarmOperator , alarmThresholdValue , email , status " +
+		String query = "SELECT username, vm_name, alarmName, description, alarmMetric , alarmOperator , alarmThresholdValue , email , status " +
 				"FROM azvasa.alarm WHERE status = 'Running'" ;
 
-		List<Map<String, Object>> rows = template.queryForList(alarms);
+		List<Map<String, Object>> rows = template.queryForList(query);
 		if ((rows != null) || (rows.size() > 0)) {
 			for (Map<String, Object> tempRow : rows)
 			{
@@ -55,6 +59,7 @@ public class AlarmMonitor{
 					for(Map<String,Object>result:results){
 						if(Integer.parseInt(result.get(alarmMetric).toString())>=threshold){
 							emailService.sendEmail(email,"Alert from Azvasa",String.format("<b>Alarm with name %s for your VM %s has been triggered</b>",alarmName,vmName));
+							alarmService.updateTriggeringAlarm(alarmName, vmName);
 							break;
 						}
 					}
@@ -63,6 +68,7 @@ public class AlarmMonitor{
 					for(Map<String,Object>result:results){
 						if(Integer.parseInt(result.get(alarmMetric).toString())<=threshold){
 							emailService.sendEmail(email,"Alert from Azvasa",String.format("<b>Alarm with name %s for your VM %s has been triggered</b>",alarmName,vmName));
+							alarmService.updateTriggeringAlarm(alarmName, vmName);
 							break;
 						}
 					}
