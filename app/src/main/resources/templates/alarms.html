@@ -127,14 +127,10 @@
         var auto_ref=setInterval(function() {$("#alarmGrid").data("kendoGrid").destroy();getAllAlarms();}, 60000);
 
         var data = [
-            {text: "CPU Usage", value:"cpu"},
-            {text: "Memory Usage", value:"mmy"}
+            {text: "CPU Usage", value:"cpu_usage_none"},
+            {text: "Memory Usage", value:"mem_usage_none"}
         ];
         var cond= [
-            {text: "Greater than", value:"greaterThan"},
-            {text: "Less than", value:"lessThan"}
-        ];
-        var bc= [
             {text: "Greater than", value:"greaterThan"},
             {text: "Less than", value:"lessThan"}
         ];
@@ -364,39 +360,6 @@
         var rowId = e.detailRow[0].rowIndex
         var data = grid.dataItem("tr:eq("+rowId+")");
         var detailRow = e.detailRow;
-//                $.ajax({
-//            url: "/api/v1/alarms/"+data.vm_name+"/"+username,
-//            success: function (res) {
-//                // Get default value from the server response
-//                detailRow.find(".alarmInfo").kendoGrid({
-//                    dataSource: {
-//                        data:res,
-//                        schema: {
-//                            model: {
-//                                fields: {
-//                                    alarmName: {type: "string"},
-//                                    description: {type: "string"}
-//                                }
-//                            }
-//                        }
-//                    },
-//                    scrollable: false,
-//                    sortable: true,
-//                    pageable: true,
-//                    columns: [
-//                        { field: "alarmName", title:"Alarm Name", width: "70px" },
-//                        { field: "description", title:"Description", width: "110px" }
-//                    ]
-//                });
-//            },
-//            error: function () {
-//                // Stop displaying loading indicator
-//                kendo.ui.progress(editEvent.container, false);
-//                console.error("uh oh!");
-//            }
-//        });
-
-
 
         $.ajax({
             url: "/api/v1/stats/"+data.vm_name,
