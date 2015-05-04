@@ -40,7 +40,7 @@ public class AlarmMonitor{
 	//private static String lastSearchTimeStamp = "2015-04-26T02:58:00Z";
 
 
-	@Scheduled(fixedRate = 1000)
+	@Scheduled(fixedRate = 1000000)
 	public void monitorUserAlarm() throws Exception
 	{
 		lastExecutionTime = new Date().getTime();
