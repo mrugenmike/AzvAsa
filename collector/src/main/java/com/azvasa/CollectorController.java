@@ -1,31 +1,30 @@
 package com.azvasa;
 
-import com.azvasa.timer.TimerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.Timer;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class CollectorController {
 
-    private static Timer timer = new Timer();
 
-    @RequestMapping(value = "api/v1/start",method = RequestMethod.POST)
-    ResponseEntity<String> startCollector(@RequestBody @Valid StartRequest request){
-            timer.cancel();
-            timer = new Timer();
-            Collector collectorTask = new Collector(request.getVmname(),request.getLogPath());
-            timer.schedule(collectorTask, 0, 5*1000);
+    @RequestMapping(value = "api/v1/start",method = RequestMethod.POST,params= {"vmname"})
+    ResponseEntity<String> startCollector(@RequestParam(value = "vmname") String vmname)
+    {
+
+            ServiceInstanceSingleton.startLogTimer(vmname);
+
             return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "api/v1/stop",method = RequestMethod.POST)
-    ResponseEntity<String> stopCollector(){
-        timer.cancel();
+    @RequestMapping(value = "api/v1/stop",method = RequestMethod.POST,params= {"vmname"})
+    ResponseEntity<String> stopCollector(@RequestParam(value = "vmname") String vmname){
+
+        ServiceInstanceSingleton.stopLogTimer(vmname);
+
         return new ResponseEntity<String>("Stopped Timer",HttpStatus.OK);
     }
 }
