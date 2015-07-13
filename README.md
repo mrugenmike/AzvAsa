@@ -24,7 +24,7 @@ Then goto [localhost:8080](http://localhost:8080) for interacting with your appl
 
 ### Project Team
 
-Mrugen Deshmukh
+Mrugen Deshmukh- Team Lead
  
 ![Mrugen's Pic](https://avatars2.githubusercontent.com/u/1036740?v=2&s=460=50x50)
 
