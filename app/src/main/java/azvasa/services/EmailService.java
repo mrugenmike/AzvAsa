@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EmailService  {
-    public final SendGrid sendgrid = new SendGrid("mrugen.deshmukh@sjsu.edu","emailking@123");
+    public final SendGrid sendgrid = new SendGrid("dummy","dummy");
     public void sendEmail(String emailId,String subject,String htmlBody) throws SendGridException {
         SendGrid.Email email = new SendGrid.Email();
         email.addTo(emailId);
